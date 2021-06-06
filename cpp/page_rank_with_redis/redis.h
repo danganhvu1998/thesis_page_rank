@@ -6,8 +6,9 @@ using namespace std;
 long long const MAX_WORKERS = 100;
 
 redisContext* local = redisConnect("127.0.0.1", 6379);
-redisContext* workers[MAX_WORKERS];
+redisContext* workersContext[MAX_WORKERS];
 redisReply* reply;
+long long workersCount = 1;
 long long workersNodeStart[MAX_WORKERS], workersNodeEnd[MAX_WORKERS];
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 0;
@@ -18,7 +19,7 @@ void printRedisReply(redisReply* reply, char* startStr = "") {
     printf("%sINTEGER: %lld\n", startStr, reply->integer);
     printf("%sSTRING: %s\n", startStr, reply->str);
     printf("%sELEMENTS: %ld\n", startStr, reply->elements);
-    for (int i = 0; i < reply->elements; i++) {
+    for (long long i = 0; i < reply->elements; i++) {
         printRedisReply(reply->element[i], "____ ");
     }
     printf("%s================================================\n", startStr);
@@ -48,7 +49,7 @@ char* getValsCommand(long long* nodesId, long long nodesCount, long long roundId
     // TODO: Add maximum nodesCount
     char* res = new char[28 * nodesCount]; // 28 stand for length of node_%s_%lf
     strcpy(res, "MGET ");
-    for (int i = 0; i < nodesCount; i++) {
+    for (long long i = 0; i < nodesCount; i++) {
         char* valName = getValName(nodesId[i], roundId);
         strcat(res, valName);
         free(valName);
@@ -60,7 +61,7 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
     // TODO: Add maximum nodesCount
     char* res = new char[28 * nodesCount]; // 28 stand for length of node_%s_%lf
     strcpy(res, "DEL ");
-    for (int i = 0; i < nodesCount; i++) {
+    for (long long i = 0; i < nodesCount; i++) {
         char* valName = getValName(nodesId[i], roundId);
         strcat(res, valName);
         free(valName);
@@ -77,7 +78,7 @@ void delAllNodesAtRound(long long roundId, redisContext* context = local) {
     free(command);
     command = new char[5 + 28 * reply->elements];
     strcpy(command, "DEL ");
-    for (int i = 0; i < reply->elements; i++) {
+    for (long long i = 0; i < reply->elements; i++) {
         strcat(command, reply->element[i]->str);
         strcat(command, " ");
     }
@@ -92,7 +93,7 @@ char* setValsCommand(long long* nodesId, double* values, long long nodesCount, l
     // TODO: Add maximum nodesCount
     char* res = new char[28 * nodesCount];
     strcpy(res, "MSET ");
-    for (int i = 0; i < nodesCount; i++) {
+    for (long long i = 0; i < nodesCount; i++) {
         char* setPath = getSetPath(nodesId[i], values[i], roundId);
         strcat(res, setPath);
         free(setPath);
@@ -122,7 +123,7 @@ double* executeGetValsCommand(char* command, redisContext* context = local) {
     }
     if (debugLevel >= 20) {
         printf("____ _____ executeGetValsCommand result: ");
-        for (int i = 0; i < reply->elements; i++) {
+        for (long long i = 0; i < reply->elements; i++) {
             printf("%lf ", res[i]);
         }
         printf("\n");
@@ -157,26 +158,52 @@ void setNodeVal(long long nodeId, double value, long long roundId) {
 }
 
 double* getNodesValRedis(long long* nodesId, long long nodesCount, long long roundId) {
-    char* command = getValsCommand(nodesId, nodesCount, roundId);
-    double* res = executeGetValsCommand(command);
-    free(command);
-    return res;
+    double* result = new double[nodesCount];
+    // TODO: Getting values from worker can work in parallel
+    for (long long i = 0; i < workersCount; i++) {
+        long long nodesInWorkersCount = 0;
+        for (long long j = 0; j < nodesCount; j++) if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) ++nodesInWorkersCount;
+        long long nodesInWorkers[nodesInWorkersCount], nextPos = 0, currPos = 0;
+        cout << "nodesInWorkersCount " << nodesInWorkersCount << endl;
+        for (long long j = 0; j < nodesCount; j++) {
+            if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) {
+                nodesInWorkers[nextPos] = nodesId[j];
+                ++nextPos;
+            }
+        }
+        char* command = getValsCommand(nodesInWorkers, nodesInWorkersCount, roundId);
+        double* res = executeGetValsCommand(command, workersContext[i]);
+        free(command);
+        for (long long j = 0; j < nodesCount; j++) {
+            if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) {
+                result[j] = res[currPos];
+                ++currPos;
+            }
+        }
+        free(res);
+    }
+    return result;
 }
 
 void getRunningEnv() {
-    int N, startNode, endNode;
-    freopen(".env", "r", stdin);
-    cin >> N;
+    long long startNode, endNode;
     string ip;
-    for (int i = 0; i < N; i++) {
+    freopen(".env", "r", stdin);
+    cin >> workersCount;
+    for (long long i = 0; i < workersCount; i++) {
         cin >> ip >> startNode >> endNode;
-        workers[i] = redisConnect(ip.c_str(), 6379);
+        workersContext[i] = redisConnect(ip.c_str(), 6379);
         workersNodeStart[i] = startNode;
         workersNodeEnd[i] = endNode;
+        cout << ip << " " << workersNodeStart[i] << " " << workersNodeEnd[i];
+        reply = (redisReply*)redisCommand(workersContext[i], "ping");
+        printRedisReply(reply);
+        freeReplyObject(reply);
     }
 }
 
 bool __testRedis() {
+    getRunningEnv();
     bool testResult = true;
     long long nodesCount = 7;
     long long roundId = 9;
@@ -184,22 +211,22 @@ bool __testRedis() {
     double values[] = { 1.13412341432, 4.1132413241234, 6.412341321324, 7.541323234 ,8.713241234567, 20.7456, 15.456098765437 };
     setNodesValRedis(nodesId, values, nodesCount, roundId);
     double* getVals = getNodesValRedis(nodesId, nodesCount, roundId);
-    for (int i = 0; i < nodesCount; i++) {
+    for (long long i = 0; i < nodesCount; i++) {
         if (!isEqual(values[i], getVals[i])) testResult = false;
     }
     if (debugLevel >= 20) {
-        for (int i = 0; i < nodesCount; i++) {
+        for (long long i = 0; i < nodesCount; i++) {
             printf("Set value: %lf; Get value: %lf; Is correct: %d\n", values[i], getVals[i], isEqual(values[i], getVals[i]));
         }
         printf("\n");
     }
     delAllNodesAtRound(9);
     getVals = getNodesValRedis(nodesId, nodesCount, roundId);
-    for (int i = 0; i < nodesCount; i++) {
+    for (long long i = 0; i < nodesCount; i++) {
         if (!isEqual(-1, getVals[i])) testResult = false;
     }
     if (debugLevel >= 20) {
-        for (int i = 0; i < nodesCount; i++) {
+        for (long long i = 0; i < nodesCount; i++) {
             printf("Set value: null(deleted); Get value: %lf; Is correct: %d\n", getVals[i], isEqual(-1, getVals[i]));
         }
         printf("\n");
