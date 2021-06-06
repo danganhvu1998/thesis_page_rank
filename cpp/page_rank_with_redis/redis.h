@@ -1,13 +1,10 @@
 #include <stdio.h>
 #include <hiredis/hiredis.h>
 
-redisContext* context = redisConnect("127.0.0.1", 6379);
+redisContext* local = redisConnect("127.0.0.1", 6379);
 redisReply* reply;
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 0;
-char* thisWorkerIpAddress;
-char* masterWorkerIpAddress;
-char** workersIpAddress;
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
     printf("%s================================================\n", startStr);
@@ -66,7 +63,7 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
     return res;
 }
 
-void delAllNodesAtRound(long long roundId) {
+void delAllNodesAtRound(long long roundId, redisContext* context = local) {
     char* command = new char[100];
     sprintf(command, "KEYS *_%lld", roundId);
     reply = (redisReply*)redisCommand(context, command);
@@ -97,7 +94,7 @@ char* setValsCommand(long long* nodesId, double* values, long long nodesCount, l
     return res;
 }
 
-double* executeGetValsCommand(char* command) {
+double* executeGetValsCommand(char* command, redisContext* context = local) {
     if (debugLevel >= 20) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
@@ -130,7 +127,7 @@ double* executeGetValsCommand(char* command) {
     return res;
 }
 
-void executeSetValsCommand(char* command) {
+void executeSetValsCommand(char* command, redisContext* context = local) {
     if (debugLevel >= 20) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
@@ -154,16 +151,10 @@ void setNodeVal(long long nodeId, double value, long long roundId) {
 }
 
 double* getNodesValRedis(long long* nodesId, long long nodesCount, long long roundId) {
-    // TODO NOW: Separate which worker will run this
     char* command = getValsCommand(nodesId, nodesCount, roundId);
     double* res = executeGetValsCommand(command);
     free(command);
     return res;
-}
-
-void getInitInformation() {
-    freopen("graph_10e5.out", "r", stdin);
-    freopen("result.out", "w", stdout);
 }
 
 bool __testRedis() {
