@@ -8,10 +8,10 @@ long long const MAX_WORKERS = 100;
 redisContext* local = redisConnect("127.0.0.1", 6379);
 redisContext* workersContext[MAX_WORKERS];
 redisReply* reply;
-long long workersCount = 1;
+long long workersCount = 1, localWorkerStartNode, localWorkerEndNode;
 long long workersNodeStart[MAX_WORKERS], workersNodeEnd[MAX_WORKERS];
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
-long long debugLevel = 0;
+long long debugLevel = 100;
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
     printf("%s================================================\n", startStr);
@@ -200,6 +200,8 @@ void getRunningEnv() {
         printRedisReply(reply);
         freeReplyObject(reply);
     }
+    localWorkerStartNode = workersNodeStart[0];
+    localWorkerEndNode = workersNodeEnd[0];
 }
 
 bool __testRedis() {
