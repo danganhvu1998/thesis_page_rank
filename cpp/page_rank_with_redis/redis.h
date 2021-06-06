@@ -1,8 +1,14 @@
 #include <stdio.h>
+#include <bits/stdc++.h>
 #include <hiredis/hiredis.h>
 
+using namespace std;
+long long const MAX_WORKERS = 100;
+
 redisContext* local = redisConnect("127.0.0.1", 6379);
+redisContext* workers[MAX_WORKERS];
 redisReply* reply;
+long long workersNodeStart[MAX_WORKERS], workersNodeEnd[MAX_WORKERS];
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 0;
 
@@ -155,6 +161,19 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
     double* res = executeGetValsCommand(command);
     free(command);
     return res;
+}
+
+void getRunningEnv() {
+    int N, startNode, endNode;
+    freopen(".env", "r", stdin);
+    cin >> N;
+    string ip;
+    for (int i = 0; i < N; i++) {
+        cin >> ip >> startNode >> endNode;
+        workers[i] = redisConnect(ip.c_str(), 6379);
+        workersNodeStart[i] = startNode;
+        workersNodeEnd[i] = endNode;
+    }
 }
 
 bool __testRedis() {
