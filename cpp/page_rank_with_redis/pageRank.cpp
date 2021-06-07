@@ -72,7 +72,7 @@ int main() {
     // for0(i, N) nodeWeight[0][i] = 1;
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
-        if (i >= 2) delAllNodesAtRound(i - 2);
+        if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
         lastRound = i;
         if (isAcceptErrorSatisfied()) break;
