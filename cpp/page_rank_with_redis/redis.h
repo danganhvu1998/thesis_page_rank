@@ -178,6 +178,7 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
             printf("Worker %s is contains %lld nodes\n", ip[i], nodesInWorkersCount);
         }
         char* command = getValsCommand(nodesInWorkers, nodesInWorkersCount, roundId);
+        long long waitedCount = 0;
         while (1) {
             double* res = executeGetValsCommand(command, workersContext[i]);
             bool isDone = true;
@@ -192,10 +193,11 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
             free(res);
             if (isDone) break;
             else {
+                ++waitedCount;
                 if (debugLevel >= 5) {
-                    printf("getNodesValRedis: Worker %s is not yet finished round %lld. Wait 0.5sec\n", ip[i], roundId);
+                    printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", ip[i], roundId, waitedCount / 2);
                 }
-                usleep(500);
+                usleep(500000);
             }
         }
         free(command);
