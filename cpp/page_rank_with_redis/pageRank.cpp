@@ -55,7 +55,7 @@ bool isAcceptErrorSatisfied() {
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
-    getRunningEnv(); debugLevel = 100;
+    getRunningEnv(); debugLevel = 10;
     freopen("graph_10e5.out", "r", stdin);
     freopen("result.out", "w", stdout);
     // INPUT GRAPH
