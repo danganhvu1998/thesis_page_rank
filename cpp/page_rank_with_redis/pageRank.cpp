@@ -13,7 +13,7 @@ using namespace std;
 #define for0(i, n) for (long long i = 0; i < n; i++)
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
-long long const MAX_ROUND = 3;
+long long const MAX_ROUND = 30;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
@@ -57,7 +57,7 @@ int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
     getRunningEnv(); debugLevel = 0;
     freopen("graph_100.out", "r", stdin);
-    // freopen("result.out", "w", stdout);
+    freopen("result.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;

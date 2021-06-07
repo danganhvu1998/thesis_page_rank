@@ -8,8 +8,11 @@ long long const MAX_WORKERS = 100;
 redisContext* local = redisConnect("127.0.0.1", 6379);
 redisContext* workersContext[MAX_WORKERS];
 redisReply* reply;
-long long workersCount = 1, localWorkerStartNode, localWorkerEndNode;
-long long workersNodeStart[MAX_WORKERS], workersNodeEnd[MAX_WORKERS];
+long long workersCount = 1;
+char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
+long long workersNodeStart[MAX_WORKERS] = { 0, 50 };
+long long workersNodeEnd[MAX_WORKERS] = { 50, 99999 };
+long long localWorkerStartNode, localWorkerEndNode;
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
 
@@ -164,7 +167,6 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
         long long nodesInWorkersCount = 0;
         for (long long j = 0; j < nodesCount; j++) if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) ++nodesInWorkersCount;
         long long nodesInWorkers[nodesInWorkersCount], nextPos = 0, currPos = 0;
-        cout << "nodesInWorkersCount " << nodesInWorkersCount << endl;
         for (long long j = 0; j < nodesCount; j++) {
             if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) {
                 nodesInWorkers[nextPos] = nodesId[j];
@@ -187,15 +189,15 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
 
 void getRunningEnv() {
     long long startNode, endNode;
-    string ip;
-    freopen(".env", "r", stdin);
-    cin >> workersCount;
+    // freopen(".env", "r", stdin);
+    // cin >> workersCount;
     for (long long i = 0; i < workersCount; i++) {
-        cin >> ip >> startNode >> endNode;
-        workersContext[i] = redisConnect(ip.c_str(), 6379);
-        workersNodeStart[i] = startNode;
-        workersNodeEnd[i] = endNode;
-        cout << ip << " " << workersNodeStart[i] << " " << workersNodeEnd[i];
+        // cin >> ip >> startNode >> endNode;
+        // workersContext[i] = redisConnect(ip.c_str(), 6379);
+        // workersNodeStart[i] = startNode;
+        // workersNodeEnd[i] = endNode;
+        // cout << ip << " " << workersNodeStart[i] << " " << workersNodeEnd[i];
+        workersContext[i] = redisConnect(ip[i], 6379);
         reply = (redisReply*)redisCommand(workersContext[i], "ping");
         printRedisReply(reply);
         freeReplyObject(reply);
