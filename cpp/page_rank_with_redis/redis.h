@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <bits/stdc++.h>
+#include <unistd.h>
 #include <hiredis/hiredis.h>
 
 using namespace std;
@@ -8,7 +9,7 @@ long long const MAX_WORKERS = 100;
 redisContext* local = redisConnect("127.0.0.1", 6379);
 redisContext* workersContext[MAX_WORKERS];
 redisReply* reply;
-long long workersCount = 1;
+long long workersCount = 2;
 char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
 long long workersNodeStart[MAX_WORKERS] = { 0, 50 };
 long long workersNodeEnd[MAX_WORKERS] = { 50, 99999 };
@@ -173,16 +174,31 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
                 ++nextPos;
             }
         }
+        if (debugLevel >= 5) {
+            printf("Worker %s is contains %lld nodes\n", ip[i], nodesInWorkersCount);
+        }
         char* command = getValsCommand(nodesInWorkers, nodesInWorkersCount, roundId);
-        double* res = executeGetValsCommand(command, workersContext[i]);
-        free(command);
-        for (long long j = 0; j < nodesCount; j++) {
-            if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) {
-                result[j] = res[currPos];
-                ++currPos;
+        while (1) {
+            double* res = executeGetValsCommand(command, workersContext[i]);
+            bool isDone = true;
+            currPos = 0;
+            for (long long j = 0; j < nodesCount; j++) {
+                if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) {
+                    if (res[currPos] < 0) isDone = false;
+                    result[j] = res[currPos];
+                    ++currPos;
+                }
+            }
+            free(res);
+            if (isDone) break;
+            else {
+                if (debugLevel >= 5) {
+                    printf("getNodesValRedis: Worker %s is not yet finished round %lld. Wait 0.5sec\n", ip[i], roundId);
+                }
+                usleep(500);
             }
         }
-        free(res);
+        free(command);
     }
     return result;
 }

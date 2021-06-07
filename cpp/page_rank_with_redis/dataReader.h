@@ -74,7 +74,6 @@ double* getNodesVal(long long* nodesId, long long nodesCount, long long roundId)
     }
     free(resultFromRedis);
     return res;
-    // Check Other Workers: Not yet implemented
 }
 
 double getNodeVal(long long nodeId, long long roundId) {
