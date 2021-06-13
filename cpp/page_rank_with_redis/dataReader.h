@@ -13,6 +13,7 @@ std::map<long long, double>::iterator it;
 
 
 double getValueFromCache(long long nodeId, long long roundId) {
+    return -1;
     long long key = roundId * maxNodes + nodeId;
     it = nodesCache.find(key);
     if (it != nodesCache.end()) { // FOUND
