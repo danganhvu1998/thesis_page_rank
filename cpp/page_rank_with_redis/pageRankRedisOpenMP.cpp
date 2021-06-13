@@ -32,7 +32,7 @@ long long lastRound = 0;
 
 void calculation(long long round) {
     int lastRound = round - 1;
-    // # pragma omp parallel for default(shared) schedule(guided)
+# pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) {
         double weight = 0;
         // long long* nodesId = new long long[edgesTo[i].size()];
