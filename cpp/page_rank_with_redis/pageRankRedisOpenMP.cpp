@@ -34,6 +34,7 @@ void calculation(long long round) {
     int lastRound = round - 1;
 # pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) {
+        // printf("NODE %lld THREAD %d\n", i, omp_get_thread_num());
         double weight = 0;
         // long long* nodesId = new long long[edgesTo[i].size()];
         long long* nodesId = (long long*)malloc(edgesTo[i].size() * sizeof(long long));
@@ -55,7 +56,7 @@ bool isAcceptErrorSatisfied() {
     for0(i, N) {
         double error = abs(getNodeVal(i, lastRound) - getNodeVal(i, lastRound - 1));
         if (error > ACCEPT_ERROR) {
-            printf("Round %lld Node %lld Error %lf\n", lastRound, i, error);
+            printf("        Round %lld Node %lld Error %lf\n", lastRound, i, error);
             return false;
         }
     }

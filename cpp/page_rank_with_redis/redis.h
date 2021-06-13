@@ -17,8 +17,8 @@ long long localWorkerStartNode, localWorkerEndNode;
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
 
-void debugRedisReply(redisReply* reply) {
-    if (debugLevel >= 30) printf("debugRedisReply->redisReply's Pointer: %p %d\n", reply, omp_get_thread_num());
+void debugRedisReply(redisReply* reply, char* command = "") {
+    if (debugLevel >= 30) printf("debugRedisReply->redisReply's Pointer: '%s' %p %d\n", command, reply, omp_get_thread_num());
 }
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
@@ -87,7 +87,7 @@ void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId) 
     // char* command = new char[100];
     char* command = (char*)malloc(100 * sizeof(char));
     sprintf(command, "KEYS *_%lld", roundId);
-    redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply);
+    redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
     if (debugLevel >= 30) printRedisReply(reply);
     free(command);
     // command = new char[5 + 28 * reply->elements];
@@ -99,9 +99,9 @@ void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId) 
     }
     if (debugLevel >= 20) printf("delAllNodesAtRound->command: %s\n", command);
     freeReplyObject(reply);
-    reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply);
+    reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
     freeReplyObject(reply);
-    free(context);
+    redisFree(context);
     redisCommandCount += 2;
 }
 
@@ -123,7 +123,7 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
     if (debugLevel >= 20) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
-    redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply);
+    redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
     // double* res = new double[reply->elements];
     double* res = (double*)malloc(reply->elements * sizeof(double));
     if (debugLevel >= 25) {
@@ -148,7 +148,7 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
         printf("\n");
     }
     freeReplyObject(reply);
-    free(context);
+    redisFree(context);
     ++redisCommandCount;
     ++redisGetCount;
     return res;
@@ -159,9 +159,9 @@ void executeSetValsCommand(char* command, long long contextId = localWorkerId) {
     if (debugLevel >= 20) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
-    redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply);
+    redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
     freeReplyObject(reply);
-    free(context);
+    redisFree(context);
     ++redisCommandCount;
     ++redisSetCount;
     return;
