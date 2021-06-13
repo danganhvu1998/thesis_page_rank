@@ -1,6 +1,8 @@
 // https://codeforces.com/contest/1336/problem/C
 #include <bits/stdc++.h>
 #include <omp.h>
+#include <chrono>
+#include <ctime>    
 using namespace std;
 
 #define II pair<long long, long long>
@@ -26,12 +28,13 @@ long long lastRound = 0;
 void debugTime(string debugString) {
     auto currTime = chrono::system_clock::now();
     time_t humanTime = chrono::system_clock::to_time_t(currTime);
-    cout << "At " << ctime(&humanTime) << ": " << debugString << "\n";
+    cout << "At " << ctime(&humanTime) << "    " << debugString << "\n";
 }
 
 void calculation(long long round) {
     int lastRound = round % 2;
     int currRound = 1 - lastRound;
+# pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) {
         double weight = 0;
         for0(j, edgesTo[i].size()) {
@@ -56,7 +59,7 @@ bool isAcceptErrorSastisfied() {
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
     freopen("graph_10e6.out", "r", stdin);
-    freopen("result10e6.out", "w", stdout);
+    freopen("result10e6_opeMP.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -70,6 +73,8 @@ int main() {
     debugTime("Done Reading");
     // INIT WEIGHT
     for0(i, N) nodeWeight[0][i] = 1;
+    int threadNumber = omp_get_max_threads();
+    cout << "threadNumber " << threadNumber << '\n';
     for0(i, MAX_ROUND) {
         calculation(i);
         debugTime("Done round " + to_string(i));
