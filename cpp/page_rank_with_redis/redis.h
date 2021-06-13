@@ -18,7 +18,7 @@ long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
 
 void debugRedisReply(redisReply* reply) {
-    printf("debugRedisReply->redisReply's Pointer: %p %d\n", reply, omp_get_thread_num());
+    if (debugLevel >= 30) printf("debugRedisReply->redisReply's Pointer: %p %d\n", reply, omp_get_thread_num());
 }
 
 void printRedisReply(redisReply* reply, char* startStr = "") {

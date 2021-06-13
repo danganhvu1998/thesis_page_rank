@@ -55,6 +55,7 @@ bool isAcceptErrorSatisfied() {
     for0(i, N) {
         double error = abs(getNodeVal(i, lastRound) - getNodeVal(i, lastRound - 1));
         if (error > ACCEPT_ERROR) {
+            printf("Round %lld Node %lld Error %lf\n", lastRound, i, error);
             return false;
         }
     }
@@ -62,10 +63,9 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false); cin.tie(0);
-    omp_set_num_threads(2);
+    omp_set_num_threads(1);
     getRunningEnv(); debugLevel = 0;
-    freopen("graph_100.data", "r", stdin);
+    freopen("graph_1000.data", "r", stdin);
     // freopen("result_redis_openMP_10e6.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
