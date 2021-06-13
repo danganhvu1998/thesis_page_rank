@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <hiredis/hiredis.h>
+#include <omp.h>
 #include "dataReader.h"
 
 using namespace std;

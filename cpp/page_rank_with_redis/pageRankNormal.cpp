@@ -1,5 +1,8 @@
 // https://codeforces.com/contest/1336/problem/C
 #include <bits/stdc++.h>
+#include <omp.h>
+#include <chrono>
+#include <ctime>    
 using namespace std;
 
 #define II pair<long long, long long>
@@ -13,8 +16,8 @@ using namespace std;
 
 long long const MAX_ROUND = 1000;
 double const ACCEPT_ERROR = 0.000001;
-long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
-long long const MAXIMUM_NODE_SUPPORT = e6; // Accept maximum e6 nodes
+long long const oo = 1000000007, e5 = 100007, e6 = 1000007, e7 = 1000007;
+long long const MAXIMUM_NODE_SUPPORT = e7; // Accept maximum e6 nodes
 
 vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
 double nodeWeight[2][MAXIMUM_NODE_SUPPORT];
@@ -25,6 +28,7 @@ long long lastRound = 0;
 void calculation(long long round) {
     int lastRound = round % 2;
     int currRound = 1 - lastRound;
+# pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) {
         double weight = 0;
         for0(j, edgesTo[i].size()) {
@@ -48,8 +52,8 @@ bool isAcceptErrorSastisfied() {
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
-    freopen("graph_100.out", "r", stdin);
-    freopen("resultNormal.out", "w", stdout);
+    freopen("graph_10e6.out", "r", stdin);
+    freopen("result10e6.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -59,9 +63,10 @@ int main() {
         ++toNodesCount[a];
         edgesTo[b].push_back(a);
     }
-
     // INIT WEIGHT
     for0(i, N) nodeWeight[0][i] = 1;
+    int threadNumber = omp_get_max_threads();
+    cout << "threadNumber " << threadNumber << '\n';
     for0(i, MAX_ROUND) {
         calculation(i);
         cout << "DONE " << lastRound << '\n';
