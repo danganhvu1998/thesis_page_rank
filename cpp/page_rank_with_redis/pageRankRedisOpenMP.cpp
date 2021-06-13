@@ -41,7 +41,9 @@ void calculation(long long round) {
         for0(j, edgesTo[i].size()) {
             nodesId[j] = edgesTo[i][j];
         }
-        double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
+        double* values;
+#pragma omp critical
+        values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
         free(nodesId);
         for0(j, edgesTo[i].size()) {
             const int fromNode = edgesTo[i][j];
@@ -64,9 +66,10 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    omp_set_num_threads(2);
-    getRunningEnv(); debugLevel = 00;
-    freopen("graph_100.data", "r", stdin);
+    omp_set_num_threads(1);
+    nodesCache.clear();
+    getRunningEnv(); debugLevel = 0;
+    freopen("graph_1000.data", "r", stdin);
     freopen("result_redis_openMP_2.out.data", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
