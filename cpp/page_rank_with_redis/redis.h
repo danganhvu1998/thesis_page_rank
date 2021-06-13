@@ -12,6 +12,7 @@ long long workersCount = 1;
 char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
 long long workersNodeStart[MAX_WORKERS] = { 0, 50000 };
 long long workersNodeEnd[MAX_WORKERS] = { 9999999, 999999 };
+long long localWorkerId = 0;
 long long localWorkerStartNode, localWorkerEndNode;
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
@@ -81,7 +82,8 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
     return res;
 }
 
-void delAllNodesAtRound(long long roundId, redisContext* context = local) {
+void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId) {
+    redisContext* context = redisConnect(ip[contextId], 6379);
     // char* command = new char[100];
     char* command = (char*)malloc(100 * sizeof(char));
     sprintf(command, "KEYS *_%lld", roundId);
@@ -99,6 +101,7 @@ void delAllNodesAtRound(long long roundId, redisContext* context = local) {
     freeReplyObject(reply);
     reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply);
     freeReplyObject(reply);
+    free(context);
     redisCommandCount += 2;
 }
 
@@ -115,7 +118,8 @@ char* setValsCommand(long long* nodesId, double* values, long long nodesCount, l
     return res;
 }
 
-double* executeGetValsCommand(char* command, redisContext* context = local) {
+double* executeGetValsCommand(char* command, long long contextId = localWorkerId) {
+    redisContext* context = redisConnect(ip[contextId], 6379);
     if (debugLevel >= 20) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
@@ -144,17 +148,20 @@ double* executeGetValsCommand(char* command, redisContext* context = local) {
         printf("\n");
     }
     freeReplyObject(reply);
+    free(context);
     ++redisCommandCount;
     ++redisGetCount;
     return res;
 }
 
-void executeSetValsCommand(char* command, redisContext* context = local) {
+void executeSetValsCommand(char* command, long long contextId = localWorkerId) {
+    redisContext* context = redisConnect(ip[contextId], 6379);
     if (debugLevel >= 20) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
     redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply);
     freeReplyObject(reply);
+    free(context);
     ++redisCommandCount;
     ++redisSetCount;
     return;
@@ -193,7 +200,7 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
         char* command = getValsCommand(nodesInWorkers, nodesInWorkersCount, roundId);
         long long waitedCount = 0;
         while (1) {
-            double* res = executeGetValsCommand(command, workersContext[i]);
+            double* res = executeGetValsCommand(command, i);
             bool isDone = true;
             currPos = 0;
             for (long long j = 0; j < nodesCount; j++) {
@@ -233,8 +240,8 @@ void getRunningEnv() {
         printRedisReply(reply);
         freeReplyObject(reply);
     }
-    localWorkerStartNode = workersNodeStart[0];
-    localWorkerEndNode = workersNodeEnd[0];
+    localWorkerStartNode = workersNodeStart[localWorkerId];
+    localWorkerEndNode = workersNodeEnd[localWorkerId];
 }
 
 bool __testRedis() {
