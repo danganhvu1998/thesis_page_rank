@@ -18,7 +18,7 @@ long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
 
 void debugRedisReply(redisReply* reply, char* command = "") {
-    if (debugLevel >= 30) printf("debugRedisReply->redisReply's Pointer: '%s' %p %d\n", command, reply, omp_get_thread_num());
+    if (debugLevel >= 10) printf("debugRedisReply->redisReply's Pointer: '%s' %p %d %d\n", command, reply, reply->elements, omp_get_thread_num());
 }
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
@@ -126,7 +126,7 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
     redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
     // double* res = new double[reply->elements];
     double* res = (double*)malloc(reply->elements * sizeof(double));
-    if (debugLevel >= 25) {
+    if (debugLevel >= 15) {
         printRedisReply(reply);
     }
     for (long long i = 0; i < reply->elements; i++) {
@@ -156,7 +156,7 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
 
 void executeSetValsCommand(char* command, long long contextId = localWorkerId) {
     redisContext* context = redisConnect(ip[contextId], 6379);
-    if (debugLevel >= 20) {
+    if (debugLevel >= 10) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
     redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
@@ -170,7 +170,6 @@ void executeSetValsCommand(char* command, long long contextId = localWorkerId) {
 void setNodesValRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
     char* command = setValsCommand(nodesId, values, nodesCount, roundId);
     executeSetValsCommand(command);
-    if (debugLevel >= 5) printf("setNodesValRedis->command]: '%s'\n", command);
     free(command);
 }
 
@@ -229,17 +228,6 @@ void getRunningEnv() {
     long long startNode, endNode;
     // freopen(".env", "r", stdin);
     // cin >> workersCount;
-    for (long long i = 0; i < workersCount; i++) {
-        // cin >> ip >> startNode >> endNode;
-        // workersContext[i] = redisConnect(ip.c_str(), 6379);
-        // workersNodeStart[i] = startNode;
-        // workersNodeEnd[i] = endNode;
-        // cout << ip << " " << workersNodeStart[i] << " " << workersNodeEnd[i];
-        workersContext[i] = redisConnect(ip[i], 6379);
-        redisReply* reply = (redisReply*)redisCommand(workersContext[i], "ping");
-        printRedisReply(reply);
-        freeReplyObject(reply);
-    }
     localWorkerStartNode = workersNodeStart[localWorkerId];
     localWorkerEndNode = workersNodeEnd[localWorkerId];
 }

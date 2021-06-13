@@ -31,7 +31,7 @@ long long N, M;
 long long lastRound = 0;
 
 void calculation(long long round) {
-    int lastRound = round - 1;
+    long long lastRound = round - 1;
 # pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) {
         // printf("NODE %lld THREAD %d\n", i, omp_get_thread_num());
@@ -56,7 +56,7 @@ bool isAcceptErrorSatisfied() {
     for0(i, N) {
         double error = abs(getNodeVal(i, lastRound) - getNodeVal(i, lastRound - 1));
         if (error > ACCEPT_ERROR) {
-            printf("        Round %lld Node %lld Error %lf\n", lastRound, i, error);
+            // printf("        Round %lld Node %lld Error %lf\n", lastRound, i, error);
             return false;
         }
     }
@@ -65,9 +65,9 @@ bool isAcceptErrorSatisfied() {
 
 int main() {
     omp_set_num_threads(1);
-    getRunningEnv(); debugLevel = 0;
-    freopen("graph_1000.data", "r", stdin);
-    // freopen("result_redis_openMP_10e6.out", "w", stdout);
+    getRunningEnv(); debugLevel = 00;
+    freopen("graph_100.data", "r", stdin);
+    freopen("result_redis_openMP_1.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -77,16 +77,17 @@ int main() {
         ++toNodesCount[a];
         if (b >= localWorkerStartNode && b < localWorkerEndNode) edgesTo[b].push_back(a);
     }
-    debugTime("Done Reading");
+    // debugTime("Done Reading");
     // INIT WEIGHT
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
-        debugTime("Done round " + to_string(i));
+        // debugTime("Done round " + to_string(i));
         lastRound = i;
+        for0(i, N) cout << getNodeVal(i, lastRound) << ' '; cout << "\n";
         if (isAcceptErrorSatisfied()) break;
+        // usleep(2000000);
     }
-    for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
-    cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
+    // cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
 }
