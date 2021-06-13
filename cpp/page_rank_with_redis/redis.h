@@ -8,7 +8,6 @@ long long const MAX_WORKERS = 100;
 
 redisContext* local = redisConnect("127.0.0.1", 6379);
 redisContext* workersContext[MAX_WORKERS];
-redisReply* reply;
 long long workersCount = 1;
 char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
 long long workersNodeStart[MAX_WORKERS] = { 0, 50000 };
@@ -77,7 +76,7 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
 void delAllNodesAtRound(long long roundId, redisContext* context = local) {
     char* command = new char[100];
     sprintf(command, "KEYS *_%lld", roundId);
-    reply = (redisReply*)redisCommand(context, command);
+    redisReply* reply = (redisReply*)redisCommand(context, command);
     if (debugLevel >= 30) printRedisReply(reply);
     free(command);
     command = new char[5 + 28 * reply->elements];
@@ -109,7 +108,7 @@ double* executeGetValsCommand(char* command, redisContext* context = local) {
     if (debugLevel >= 20) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
-    reply = (redisReply*)redisCommand(context, command);
+    redisReply* reply = (redisReply*)redisCommand(context, command);
     double* res = new double[reply->elements];
     if (debugLevel >= 25) {
         printRedisReply(reply);
@@ -142,7 +141,7 @@ void executeSetValsCommand(char* command, redisContext* context = local) {
     if (debugLevel >= 20) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
-    reply = (redisReply*)redisCommand(context, command);
+    redisReply* reply = (redisReply*)redisCommand(context, command);
     freeReplyObject(reply);
     ++redisCommandCount;
     ++redisSetCount;
@@ -152,6 +151,7 @@ void executeSetValsCommand(char* command, redisContext* context = local) {
 void setNodesValRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
     char* command = setValsCommand(nodesId, values, nodesCount, roundId);
     executeSetValsCommand(command);
+    if (debugLevel >= 5) printf("setNodesValRedis->command]: '%s'\n", command);
     free(command);
 }
 
@@ -216,7 +216,7 @@ void getRunningEnv() {
         // workersNodeEnd[i] = endNode;
         // cout << ip << " " << workersNodeStart[i] << " " << workersNodeEnd[i];
         workersContext[i] = redisConnect(ip[i], 6379);
-        reply = (redisReply*)redisCommand(workersContext[i], "ping");
+        redisReply* reply = (redisReply*)redisCommand(workersContext[i], "ping");
         printRedisReply(reply);
         freeReplyObject(reply);
     }

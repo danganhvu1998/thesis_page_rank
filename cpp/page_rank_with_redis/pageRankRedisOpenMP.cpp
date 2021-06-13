@@ -32,20 +32,20 @@ long long lastRound = 0;
 
 void calculation(long long round) {
     int lastRound = round - 1;
-# pragma omp parallel for default(shared) private(reply) schedule(guided)
+# pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) {
         double weight = 0;
-        long long* nodesId = new long long[edgesTo[i].size()];
-        for0(j, edgesTo[i].size()) {
-            nodesId[j] = edgesTo[i][j];
-        }
-        double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
-        free(nodesId);
-        for0(j, edgesTo[i].size()) {
-            const int fromNode = edgesTo[i][j];
-            weight += values[j] / toNodesCount[fromNode];
-        }
-        free(values);
+        // long long* nodesId = new long long[edgesTo[i].size()];
+        // for0(j, edgesTo[i].size()) {
+        //     nodesId[j] = edgesTo[i][j];
+        // }
+        // double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
+        // free(nodesId);
+        // for0(j, edgesTo[i].size()) {
+        //     const int fromNode = edgesTo[i][j];
+        //     weight += values[j] / toNodesCount[fromNode];
+        // }
+        // free(values);
         setNodeVal(i, weight, round);
     }
 }
@@ -62,9 +62,9 @@ bool isAcceptErrorSatisfied() {
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
-    getRunningEnv(); debugLevel = 10;
-    freopen("graph_10e5.out", "r", stdin);
-    freopen("result_redis_openMP_10e6.out", "w", stdout);
+    getRunningEnv(); debugLevel = 5;
+    freopen("graph_1000.data", "r", stdin);
+    // freopen("result_redis_openMP_10e6.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -82,8 +82,8 @@ int main() {
         calculation(i);
         debugTime("Done round " + to_string(i));
         lastRound = i;
-        if (isAcceptErrorSatisfied()) break;
+        // if (isAcceptErrorSatisfied()) break;
     }
-    for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
-    cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
+    // for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
+    // cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
 }
