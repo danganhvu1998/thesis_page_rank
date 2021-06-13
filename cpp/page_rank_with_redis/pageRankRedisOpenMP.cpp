@@ -36,16 +36,17 @@ void calculation(long long round) {
     for0(i, N) {
         double weight = 0;
         // long long* nodesId = new long long[edgesTo[i].size()];
-        // for0(j, edgesTo[i].size()) {
-        //     nodesId[j] = edgesTo[i][j];
-        // }
-        // double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
-        // free(nodesId);
-        // for0(j, edgesTo[i].size()) {
-        //     const int fromNode = edgesTo[i][j];
-        //     weight += values[j] / toNodesCount[fromNode];
-        // }
-        // free(values);
+        long long* nodesId = (long long*)malloc(edgesTo[i].size() * sizeof(long long));
+        for0(j, edgesTo[i].size()) {
+            nodesId[j] = edgesTo[i][j];
+        }
+        double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
+        free(nodesId);
+        for0(j, edgesTo[i].size()) {
+            const int fromNode = edgesTo[i][j];
+            weight += values[j] / toNodesCount[fromNode];
+        }
+        free(values);
         setNodeVal(i, weight, round);
     }
 }

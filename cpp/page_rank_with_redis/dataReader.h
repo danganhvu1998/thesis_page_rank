@@ -41,7 +41,8 @@ void addCache(long long nodeId, long long roundId, double value) {
 
 // TODO: Not only get its value, but its number of children is also important
 double* getNodesVal(long long* nodesId, long long nodesCount, long long roundId) {
-    double* res = new double[nodesCount];
+    // double* res = new double[nodesCount];
+    double* res = (double*)malloc(nodesCount * sizeof(double));
     long long notCachedNodesCount = 0;
     // Check Cache
     for (int i = 0; i < nodesCount; i++) {
@@ -56,7 +57,8 @@ double* getNodesVal(long long* nodesId, long long nodesCount, long long roundId)
     if (notCachedNodesCount == 0) return res;
     // Check Redis
     long long currPos = 0;
-    long long* notCachedNodesId = new long long[notCachedNodesCount];
+    // long long* notCachedNodesId = new long long[notCachedNodesCount];
+    long long* notCachedNodesId = (long long*)malloc(notCachedNodesCount * sizeof(long long));
     for (int i = 0; i < nodesCount; i++) {
         if (res[i] < 0) {  // Not found
             notCachedNodesId[currPos] = nodesId[i];

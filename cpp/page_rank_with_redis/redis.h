@@ -33,14 +33,16 @@ bool isEqual(double a, double b, double acceptError = 0.00001) {
 }
 
 char* getValName(long long nodeId, long long roundId) {
-    char* res = new char[255];
+    // char* res = new char[255];
+    char* res = (char*)malloc(255 * sizeof(char));
     sprintf(res, "node_%lld_%lld ", nodeId, roundId); // Never hurt to add an space at the end
     if (debugLevel >= 30) printf("getValName->[nodeId, roundId, res]: %lld, %lld, '%s'\n", nodeId, roundId, res);
     return res;
 }
 
 char* getSetPath(long long nodeId, double value, long long roundId) {
-    char* res = new char[255];
+    // char* res = new char[255];
+    char* res = (char*)malloc(255 * sizeof(char));
     char* valName = getValName(nodeId, roundId);
     sprintf(res, "%s%lf ", valName, value); // Never hurt to add an space at the end
     if (debugLevel >= 30) printf("getSetPath->[nodeId, value, roundId, res]: %lld, %lf, %lld, '%s'\n", nodeId, value, roundId, res);
@@ -50,7 +52,8 @@ char* getSetPath(long long nodeId, double value, long long roundId) {
 
 char* getValsCommand(long long* nodesId, long long nodesCount, long long roundId) {
     // TODO: Add maximum nodesCount
-    char* res = new char[28 * nodesCount]; // 28 stand for length of node_%s_%lf
+    // char* res = new char[28 * nodesCount]; // 28 stand for length of node_%s_%lf
+    char* res = (char*)malloc(28 * nodesCount * sizeof(char));
     strcpy(res, "MGET ");
     for (long long i = 0; i < nodesCount; i++) {
         char* valName = getValName(nodesId[i], roundId);
@@ -62,7 +65,8 @@ char* getValsCommand(long long* nodesId, long long nodesCount, long long roundId
 
 char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId) {
     // TODO: Add maximum nodesCount
-    char* res = new char[28 * nodesCount]; // 28 stand for length of node_%s_%lf
+    // char* res = new char[28 * nodesCount]; // 28 stand for length of node_%s_%lf
+    char* res = (char*)malloc(28 * nodesCount * sizeof(char));
     strcpy(res, "DEL ");
     for (long long i = 0; i < nodesCount; i++) {
         char* valName = getValName(nodesId[i], roundId);
@@ -74,12 +78,14 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
 }
 
 void delAllNodesAtRound(long long roundId, redisContext* context = local) {
-    char* command = new char[100];
+    // char* command = new char[100];
+    char* command = (char*)malloc(100 * sizeof(char));
     sprintf(command, "KEYS *_%lld", roundId);
     redisReply* reply = (redisReply*)redisCommand(context, command);
     if (debugLevel >= 30) printRedisReply(reply);
     free(command);
-    command = new char[5 + 28 * reply->elements];
+    // command = new char[5 + 28 * reply->elements];
+    command = (char*)malloc(5 + 28 * reply->elements * sizeof(char));
     strcpy(command, "DEL ");
     for (long long i = 0; i < reply->elements; i++) {
         strcat(command, reply->element[i]->str);
@@ -94,7 +100,8 @@ void delAllNodesAtRound(long long roundId, redisContext* context = local) {
 
 char* setValsCommand(long long* nodesId, double* values, long long nodesCount, long long roundId) {
     // TODO: Add maximum nodesCount
-    char* res = new char[28 * nodesCount];
+    // char* res = new char[28 * nodesCount];
+    char* res = (char*)malloc(28 * nodesCount * sizeof(char));
     strcpy(res, "MSET ");
     for (long long i = 0; i < nodesCount; i++) {
         char* setPath = getSetPath(nodesId[i], values[i], roundId);
@@ -109,7 +116,8 @@ double* executeGetValsCommand(char* command, redisContext* context = local) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
     redisReply* reply = (redisReply*)redisCommand(context, command);
-    double* res = new double[reply->elements];
+    // double* res = new double[reply->elements];
+    double* res = (double*)malloc(reply->elements * sizeof(double));
     if (debugLevel >= 25) {
         printRedisReply(reply);
     }
@@ -162,7 +170,8 @@ void setNodeVal(long long nodeId, double value, long long roundId) {
 }
 
 double* getNodesValRedis(long long* nodesId, long long nodesCount, long long roundId) {
-    double* result = new double[nodesCount];
+    // double* result = new double[nodesCount];
+    double* result = (double*)malloc(nodesCount * sizeof(double));
     // TODO: Getting values from worker can work in parallel
     for (long long i = 0; i < workersCount; i++) {
         long long nodesInWorkersCount = 0;
