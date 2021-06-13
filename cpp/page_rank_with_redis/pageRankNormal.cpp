@@ -26,7 +26,7 @@ long long lastRound = 0;
 void debugTime(string debugString) {
     auto currTime = chrono::system_clock::now();
     time_t humanTime = chrono::system_clock::to_time_t(currTime);
-    cout << "At " << ctime(&humanTime) << ": " << debugString << "\n";
+    cout << "At " << ctime(&humanTime) << "    " << debugString << "\n";
 }
 
 void calculation(long long round) {

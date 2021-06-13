@@ -9,10 +9,10 @@ long long const MAX_WORKERS = 100;
 redisContext* local = redisConnect("127.0.0.1", 6379);
 redisContext* workersContext[MAX_WORKERS];
 redisReply* reply;
-long long workersCount = 2;
+long long workersCount = 1;
 char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
 long long workersNodeStart[MAX_WORKERS] = { 0, 50000 };
-long long workersNodeEnd[MAX_WORKERS] = { 50000, 999999 };
+long long workersNodeEnd[MAX_WORKERS] = { 9999999, 999999 };
 long long localWorkerStartNode, localWorkerEndNode;
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
@@ -174,7 +174,7 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
                 ++nextPos;
             }
         }
-        if (debugLevel >= 5) {
+        if (debugLevel >= 20) {
             printf("Worker %s is contains %lld nodes\n", ip[i], nodesInWorkersCount);
         }
         char* command = getValsCommand(nodesInWorkers, nodesInWorkersCount, roundId);

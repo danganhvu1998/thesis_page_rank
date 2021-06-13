@@ -19,8 +19,13 @@ double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
 
+void debugTime(string debugString) {
+    auto currTime = chrono::system_clock::now();
+    time_t humanTime = chrono::system_clock::to_time_t(currTime);
+    cout << "At " << ctime(&humanTime) << "    " << debugString << "\n";
+}
+
 vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
-double nodeWeight[2][MAXIMUM_NODE_SUPPORT];
 long long toNodesCount[MAXIMUM_NODE_SUPPORT];
 long long N, M;
 long long lastRound = 0;
@@ -57,8 +62,8 @@ bool isAcceptErrorSatisfied() {
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
     getRunningEnv(); debugLevel = 10;
-    freopen("graph_10e5.out", "r", stdin);
-    freopen("result.out", "w", stdout);
+    freopen("graph_10e6.out", "r", stdin);
+    freopen("result_redis_10e6.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -68,13 +73,13 @@ int main() {
         ++toNodesCount[a];
         if (b >= localWorkerStartNode && b < localWorkerEndNode) edgesTo[b].push_back(a);
     }
-
+    debugTime("Done Reading");
     // INIT WEIGHT
-    // for0(i, N) nodeWeight[0][i] = 1;
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
+        debugTime("Done round " + to_string(i));
         lastRound = i;
         if (isAcceptErrorSatisfied()) break;
     }
