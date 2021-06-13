@@ -25,6 +25,12 @@ long long toNodesCount[MAXIMUM_NODE_SUPPORT];
 long long N, M;
 long long lastRound = 0;
 
+void debugTime(string debugString) {
+    auto currTime = chrono::system_clock::now();
+    time_t humanTime = chrono::system_clock::to_time_t(currTime);
+    cout << "At " << ctime(&humanTime) << ": " << debugString << "\n";
+}
+
 void calculation(long long round) {
     int lastRound = round % 2;
     int currRound = 1 - lastRound;
@@ -52,24 +58,26 @@ bool isAcceptErrorSastisfied() {
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
-    freopen("graph_10e6.out", "r", stdin);
-    freopen("result10e6.out", "w", stdout);
+    freopen("graph_10e5.out", "r", stdin);
+    freopen("result10e5.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
+    debugTime("Start");
     for0(i, M) {
         long long a, b;
         cin >> a >> b; // From a we can go to b
         ++toNodesCount[a];
         edgesTo[b].push_back(a);
     }
+    debugTime("Done Reading");
     // INIT WEIGHT
     for0(i, N) nodeWeight[0][i] = 1;
     int threadNumber = omp_get_max_threads();
     cout << "threadNumber " << threadNumber << '\n';
     for0(i, MAX_ROUND) {
         calculation(i);
-        cout << "DONE " << lastRound << '\n';
+        debugTime("Done round " + to_string(i));
         lastRound = i;
         if (isAcceptErrorSastisfied()) break;
     }
