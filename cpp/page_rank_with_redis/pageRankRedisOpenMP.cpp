@@ -63,6 +63,7 @@ bool isAcceptErrorSatisfied() {
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
+    omp_set_num_threads(2);
     getRunningEnv(); debugLevel = 100;
     freopen("graph_100.data", "r", stdin);
     // freopen("result_redis_openMP_10e6.out", "w", stdout);
