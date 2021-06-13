@@ -228,6 +228,13 @@ void getRunningEnv() {
     long long startNode, endNode;
     // freopen(".env", "r", stdin);
     // cin >> workersCount;
+    for (long long i = 0; i < workersCount; i++) {
+        redisContext* context = redisConnect(ip[i], 6379);
+        redisReply* reply = (redisReply*)redisCommand(context, "FLUSHALL");
+        printRedisReply(reply);
+        freeReplyObject(reply);
+        redisFree(context);
+    }
     localWorkerStartNode = workersNodeStart[localWorkerId];
     localWorkerEndNode = workersNodeEnd[localWorkerId];
 }

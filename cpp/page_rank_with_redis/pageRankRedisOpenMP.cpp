@@ -64,10 +64,10 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    omp_set_num_threads(1);
+    omp_set_num_threads(2);
     getRunningEnv(); debugLevel = 00;
     freopen("graph_100.data", "r", stdin);
-    freopen("result_redis_openMP_1.out", "w", stdout);
+    freopen("result_redis_openMP_2.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
