@@ -32,7 +32,7 @@ long long lastRound = 0;
 
 void calculation(long long round) {
     int lastRound = round - 1;
-# pragma omp parallel for default(shared) schedule(guided)
+    // # pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) {
         double weight = 0;
         // long long* nodesId = new long long[edgesTo[i].size()];
@@ -63,8 +63,8 @@ bool isAcceptErrorSatisfied() {
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
-    getRunningEnv(); debugLevel = 5;
-    freopen("graph_1000.data", "r", stdin);
+    getRunningEnv(); debugLevel = 100;
+    freopen("graph_100.data", "r", stdin);
     // freopen("result_redis_openMP_10e6.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
@@ -83,8 +83,8 @@ int main() {
         calculation(i);
         debugTime("Done round " + to_string(i));
         lastRound = i;
-        // if (isAcceptErrorSatisfied()) break;
+        if (isAcceptErrorSatisfied()) break;
     }
-    // for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
-    // cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
+    for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
+    cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
 }
