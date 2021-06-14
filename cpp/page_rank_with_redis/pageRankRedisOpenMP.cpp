@@ -66,11 +66,11 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    omp_set_num_threads(1);
+    omp_set_num_threads(12);
     nodesCache.clear();
-    getRunningEnv(); debugLevel = 0;
-    freopen("graph_1000.data", "r", stdin);
-    freopen("result_redis_openMP_2.out.data", "w", stdout);
+    getRunningEnv(); debugLevel = 10;
+    freopen("graph_10e5.out", "r", stdin);
+    // freopen("result_redis_openMP_10e6.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -80,17 +80,16 @@ int main() {
         ++toNodesCount[a];
         if (b >= localWorkerStartNode && b < localWorkerEndNode) edgesTo[b].push_back(a);
     }
-    // debugTime("Done Reading");
+    debugTime("Done Reading");
     // INIT WEIGHT
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
-        // debugTime("Done round " + to_string(i));
+        debugTime("Done round " + to_string(i));
         lastRound = i;
-        for0(i, N) cout << getNodeVal(i, lastRound) << ' '; cout << "\n";
         if (isAcceptErrorSatisfied()) break;
-        // usleep(2000000);
     }
-    // cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
+    for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
+    cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
 }

@@ -55,8 +55,8 @@ bool isAcceptErrorSastisfied() {
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(0);
-    freopen("graph_10e6.out", "r", stdin);
-    freopen("result10e6.out", "w", stdout);
+    freopen("graph_1000.data", "r", stdin);
+    freopen("result1000.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
