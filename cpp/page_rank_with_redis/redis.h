@@ -5,10 +5,13 @@
 
 using namespace std;
 long long const MAX_WORKERS = 100;
+long long const MAX_THREADS = 15;
+long long CURRENT_THREAD = 0;
 
 redisContext* local = redisConnect("127.0.0.1", 6379);
-redisContext* workersContext[MAX_WORKERS];
+redisContext* workersContext[MAX_WORKERS][MAX_THREADS];
 long long workersCount = 1;
+long long maxThreads = 1;
 char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
 long long workersNodeStart[MAX_WORKERS] = { 0, 50000 };
 long long workersNodeEnd[MAX_WORKERS] = { 9999999, 999999 };
@@ -83,7 +86,8 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
 }
 
 void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId) {
-    redisContext* context = redisConnect(ip[contextId], 6379);
+    long long currThread = omp_get_thread_num();
+    redisContext* context = workersContext[contextId][currThread];
     // char* command = new char[100];
     char* command = (char*)malloc(100 * sizeof(char));
     sprintf(command, "KEYS *_%lld", roundId);
@@ -101,7 +105,6 @@ void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId) 
     freeReplyObject(reply);
     reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
     freeReplyObject(reply);
-    redisFree(context);
     redisCommandCount += 2;
 }
 
@@ -119,7 +122,8 @@ char* setValsCommand(long long* nodesId, double* values, long long nodesCount, l
 }
 
 double* executeGetValsCommand(char* command, long long contextId = localWorkerId) {
-    redisContext* context = redisConnect(ip[contextId], 6379);
+    long long currThread = omp_get_thread_num();
+    redisContext* context = workersContext[contextId][currThread];
     if (debugLevel >= 20) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
@@ -148,20 +152,19 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
         printf("\n");
     }
     freeReplyObject(reply);
-    redisFree(context);
     ++redisCommandCount;
     ++redisGetCount;
     return res;
 }
 
 void executeSetValsCommand(char* command, long long contextId = localWorkerId) {
-    redisContext* context = redisConnect(ip[contextId], 6379);
+    long long currThread = omp_get_thread_num();
+    redisContext* context = workersContext[contextId][currThread];
     if (debugLevel >= 10) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
     redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
     freeReplyObject(reply);
-    redisFree(context);
     ++redisCommandCount;
     ++redisSetCount;
     return;
@@ -228,12 +231,14 @@ void getRunningEnv() {
     long long startNode, endNode;
     // freopen(".env", "r", stdin);
     // cin >> workersCount;
+    maxThreads = omp_get_max_threads();
     for (long long i = 0; i < workersCount; i++) {
-        redisContext* context = redisConnect(ip[i], 6379);
-        redisReply* reply = (redisReply*)redisCommand(context, "FLUSHALL");
-        printRedisReply(reply);
-        freeReplyObject(reply);
-        redisFree(context);
+        for (long long j = 0; j < maxThreads; j++) {
+            workersContext[j][i] = redisConnect(ip[i], 6379);
+            redisReply* reply = (redisReply*)redisCommand(workersContext[j][i], "FLUSHALL");
+            printRedisReply(reply);
+            freeReplyObject(reply);
+        }
     }
     localWorkerStartNode = workersNodeStart[localWorkerId];
     localWorkerEndNode = workersNodeEnd[localWorkerId];
