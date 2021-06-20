@@ -42,7 +42,6 @@ void calculation(long long round) {
             nodesId[j] = edgesTo[i][j];
         }
         double* values;
-#pragma omp critical
         values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
         free(nodesId);
         for0(j, edgesTo[i].size()) {
