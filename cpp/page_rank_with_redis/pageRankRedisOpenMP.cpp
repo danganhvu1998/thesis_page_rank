@@ -14,7 +14,7 @@ using namespace std;
 #define for0(i, n) for (long long i = 0; i < n; i++)
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
-long long const MAX_ROUND = 30;
+long long const MAX_ROUND = 5;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
@@ -68,9 +68,8 @@ bool isAcceptErrorSatisfied() {
 int main() {
     omp_set_num_threads(12);
     nodesCache.clear();
-    getRunningEnv(); debugLevel = 10;
-    freopen("graph_1000.data", "r", stdin);
-    // freopen("result_redis_openMP_10e6.out", "w", stdout);
+    getRunningEnv(); debugLevel = 0;
+    freopen("graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -89,8 +88,9 @@ int main() {
         calculation(i);
         debugTime("Done round " + to_string(i));
         lastRound = i;
-        if (isAcceptErrorSatisfied()) break;
+        // if (isAcceptErrorSatisfied()) break;
     }
+    freopen("result_redis_openMP_10e6.out", "w", stdout);
     for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
     cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
 }
