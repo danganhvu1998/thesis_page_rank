@@ -21,7 +21,7 @@ long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
 
 void debugRedisReply(redisReply* reply, char* command = "") {
-    if (debugLevel >= 10) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %d; THREAD ID: %d\n", command, reply, reply->elements, omp_get_thread_num());
+    if (debugLevel >= 10) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %ld; THREAD ID: %d\n", command, reply, reply->elements, omp_get_thread_num());
 }
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
