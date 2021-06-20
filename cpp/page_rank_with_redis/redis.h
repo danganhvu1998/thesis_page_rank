@@ -21,7 +21,7 @@ long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
 
 void debugRedisReply(redisReply* reply, char* command = "") {
-    if (debugLevel >= 10) printf("debugRedisReply->redisReply's Pointer: '%s' %p %d %d\n", command, reply, reply->elements, omp_get_thread_num());
+    if (debugLevel >= 10) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %d; THREAD ID: %d\n", command, reply, reply->elements, omp_get_thread_num());
 }
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
@@ -234,8 +234,9 @@ void getRunningEnv() {
     maxThreads = omp_get_max_threads();
     for (long long i = 0; i < workersCount; i++) {
         for (long long j = 0; j < maxThreads; j++) {
-            workersContext[j][i] = redisConnect(ip[i], 6379);
-            redisReply* reply = (redisReply*)redisCommand(workersContext[j][i], "FLUSHALL");
+            workersContext[i][j] = redisConnect(ip[i], 6379);
+            printf("CONTEXT: %p; i,j: %lld %lld\n", workersContext[i][j], i, j);
+            redisReply* reply = (redisReply*)redisCommand(workersContext[i][j], "FLUSHALL");
             printRedisReply(reply);
             freeReplyObject(reply);
         }

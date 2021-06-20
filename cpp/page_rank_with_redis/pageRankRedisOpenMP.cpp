@@ -69,7 +69,7 @@ int main() {
     omp_set_num_threads(12);
     nodesCache.clear();
     getRunningEnv(); debugLevel = 10;
-    freopen("graph_10e5.out", "r", stdin);
+    freopen("graph_1000.data", "r", stdin);
     // freopen("result_redis_openMP_10e6.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
@@ -82,6 +82,7 @@ int main() {
     }
     debugTime("Done Reading");
     // INIT WEIGHT
+# pragma omp parallel for default(shared) schedule(guided)
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
         if (i >= 3) delAllNodesAtRound(i - 3);
