@@ -76,7 +76,7 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    getRunningEnv(); debugLevel = 0;
+    getRunningEnv(); debugLevel = 1;
     freopen("graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;

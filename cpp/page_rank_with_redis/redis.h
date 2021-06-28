@@ -223,7 +223,7 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
             if (isDone) break;
             else {
                 ++waitedCount;
-                if (debugLevel >= 5) {
+                if (debugLevel >= 1) {
                     printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", ip[i], roundId, waitedCount / 2);
                 }
                 usleep(500000);
