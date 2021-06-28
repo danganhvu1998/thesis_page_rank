@@ -33,7 +33,7 @@ long long lastRound = 0;
 
 void calculation(long long round) {
     int lastRound = round - 1;
-    for0(i, N) {
+    for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) {
         double weight = 0;
         // #################################
         auto t_start = std::chrono::high_resolution_clock::now();
@@ -81,6 +81,7 @@ int main() {
     freopen("graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
+    localWorkerEndNode = min(localWorkerEndNode, N);
     for0(i, N) toNodesCount[i] = 0;
     for0(i, M) {
         long long a, b;
