@@ -104,4 +104,5 @@ int main() {
     cout << "\n\nTOTAL PREPARE TIME: " << prepareTime << "\nTOTAL READ TIME: " << readTime << "\nTOTAL CALCULATION TIME: " << calculateTime << "\nFREE RUNNING CMD" << freeRunningTime;
     freopen("result_redis_10e6.out", "w", stdout);
     for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
+    debugTime("Done!");
 }
