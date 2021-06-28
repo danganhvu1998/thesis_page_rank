@@ -243,7 +243,7 @@ void getRunningEnv() {
         for (long long j = 0; j < maxThreads; j++) {
             workersContext[i][j] = redisConnect(ip[i], 6379);
             printf("CONTEXT: %p; i,j: %lld %lld\n", workersContext[i][j], i, j);
-            redisReply* reply = (redisReply*)redisCommand(workersContext[i][j], "FLUSHALL");
+            redisReply* reply = (redisReply*)redisCommand(workersContext[i][j], "PING");
             printRedisReply(reply);
             freeReplyObject(reply);
         }
