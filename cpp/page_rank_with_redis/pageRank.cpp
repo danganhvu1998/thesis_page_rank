@@ -14,10 +14,11 @@ using namespace std;
 #define for0(i, n) for (long long i = 0; i < n; i++)
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
-long long const MAX_ROUND = 30;
+long long const MAX_ROUND = 5;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
+double readTime, calculateTime, prepareTime, freeRunningTime;
 
 void debugTime(string debugString) {
     auto currTime = chrono::system_clock::now();
@@ -34,17 +35,32 @@ void calculation(long long round) {
     int lastRound = round - 1;
     for0(i, N) {
         double weight = 0;
+        // #################################
+        auto t_start = std::chrono::high_resolution_clock::now();
         long long* nodesId = new long long[edgesTo[i].size()];
         for0(j, edgesTo[i].size()) {
             nodesId[j] = edgesTo[i][j];
         }
+        auto t_end = std::chrono::high_resolution_clock::now();
+        prepareTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
+        // #################################
+        t_start = std::chrono::high_resolution_clock::now();
         double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
+        t_end = std::chrono::high_resolution_clock::now();
+        readTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         free(nodesId);
+        // #################################
+        t_start = std::chrono::high_resolution_clock::now();
         for0(j, edgesTo[i].size()) {
             const int fromNode = edgesTo[i][j];
             weight += values[j] / toNodesCount[fromNode];
         }
+        t_end = std::chrono::high_resolution_clock::now();
+        calculateTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
+        t_start = std::chrono::high_resolution_clock::now();
         free(values);
+        t_end = std::chrono::high_resolution_clock::now();
+        freeRunningTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         setNodeVal(i, weight, round);
     }
 }
@@ -60,10 +76,8 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    ios_base::sync_with_stdio(false); cin.tie(0);
-    getRunningEnv(); debugLevel = 10;
-    freopen("graph_10e6.out", "r", stdin);
-    freopen("result_redis_10e6.out", "w", stdout);
+    getRunningEnv(); debugLevel = 0;
+    freopen("graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     for0(i, N) toNodesCount[i] = 0;
@@ -81,8 +95,12 @@ int main() {
         calculation(i);
         debugTime("Done round " + to_string(i));
         lastRound = i;
-        if (isAcceptErrorSatisfied()) break;
     }
-    for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
     cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
+    cout << "\nSET CMD RUNNING TIME: " << redisSetCmdRunningTime << "\nGET CMD RUNNING TIME: " << redisGetCmdRunningTime << "\nCONVERT TIME: " << redisStringToDoubleConvertTime << "\n";
+    cout << "\nAVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount;
+    cout << "\nAVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount;
+    cout << "\n\nTOTAL PREPARE TIME: " << prepareTime << "\nTOTAL READ TIME: " << readTime << "\nTOTAL CALCULATION TIME: " << calculateTime << "\nFREE RUNNING CMD" << freeRunningTime;
+    freopen("result_redis_10e6.out", "w", stdout);
+    for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
 }

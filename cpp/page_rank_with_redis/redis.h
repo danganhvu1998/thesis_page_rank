@@ -19,9 +19,10 @@ long long localWorkerId = 0;
 long long localWorkerStartNode, localWorkerEndNode;
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
+double redisSetCmdRunningTime, redisGetCmdRunningTime, redisStringToDoubleConvertTime;
 
 void debugRedisReply(redisReply* reply, char* command = "") {
-    if (debugLevel >= 10) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %ld; THREAD ID: %d\n", command, reply, reply->elements, omp_get_thread_num());
+    if (debugLevel >= 10) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %ld;", command, reply, reply->elements);
 }
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
@@ -85,8 +86,7 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
     return res;
 }
 
-void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId) {
-    long long currThread = omp_get_thread_num();
+void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId, long long currThread = 0) {
     redisContext* context = workersContext[contextId][currThread];
     // char* command = new char[100];
     char* command = (char*)malloc(100 * sizeof(char));
@@ -121,18 +121,21 @@ char* setValsCommand(long long* nodesId, double* values, long long nodesCount, l
     return res;
 }
 
-double* executeGetValsCommand(char* command, long long contextId = localWorkerId) {
-    long long currThread = omp_get_thread_num();
+double* executeGetValsCommand(char* command, long long contextId = localWorkerId, long long currThread = 0) {
     redisContext* context = workersContext[contextId][currThread];
     if (debugLevel >= 20) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
+    auto t_start = std::chrono::high_resolution_clock::now();
     redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
+    auto t_end = std::chrono::high_resolution_clock::now();
+    redisGetCmdRunningTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
     // double* res = new double[reply->elements];
     double* res = (double*)malloc(reply->elements * sizeof(double));
     if (debugLevel >= 15) {
         printRedisReply(reply);
     }
+    t_start = std::chrono::high_resolution_clock::now();
     for (long long i = 0; i < reply->elements; i++) {
         if (debugLevel >= 30) {
             printf("____ executeGetValsCommand->[i, strResult, strResultLen]: %lld %s\n", i, reply->element[i]->str);
@@ -144,6 +147,8 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
             res[i] = -1;
         }
     }
+    t_end = std::chrono::high_resolution_clock::now();
+    redisStringToDoubleConvertTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
     if (debugLevel >= 20) {
         printf("____ _____ executeGetValsCommand result: ");
         for (long long i = 0; i < reply->elements; i++) {
@@ -157,13 +162,15 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
     return res;
 }
 
-void executeSetValsCommand(char* command, long long contextId = localWorkerId) {
-    long long currThread = omp_get_thread_num();
+void executeSetValsCommand(char* command, long long contextId = localWorkerId, long long currThread = 0) {
     redisContext* context = workersContext[contextId][currThread];
     if (debugLevel >= 10) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
+    auto t_start = std::chrono::high_resolution_clock::now();
     redisReply* reply = (redisReply*)redisCommand(context, command); debugRedisReply(reply, command);
+    auto t_end = std::chrono::high_resolution_clock::now();
+    redisSetCmdRunningTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
     freeReplyObject(reply);
     ++redisCommandCount;
     ++redisSetCount;
@@ -231,7 +238,7 @@ void getRunningEnv() {
     long long startNode, endNode;
     // freopen(".env", "r", stdin);
     // cin >> workersCount;
-    maxThreads = omp_get_max_threads();
+    maxThreads = 1;
     for (long long i = 0; i < workersCount; i++) {
         for (long long j = 0; j < maxThreads; j++) {
             workersContext[i][j] = redisConnect(ip[i], 6379);
