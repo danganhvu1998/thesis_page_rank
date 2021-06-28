@@ -10,7 +10,7 @@ long long CURRENT_THREAD = 0;
 
 redisContext* local = redisConnect("127.0.0.1", 6379);
 redisContext* workersContext[MAX_WORKERS][MAX_THREADS];
-long long workersCount = 1;
+long long workersCount = 2;
 long long maxThreads = 1;
 char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
 long long workersNodeStart[MAX_WORKERS] = { 0, 50000 };
