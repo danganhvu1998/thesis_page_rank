@@ -101,7 +101,9 @@ int main() {
     cout << "\nSET CMD RUNNING TIME: " << redisSetCmdRunningTime << "\nGET CMD RUNNING TIME: " << redisGetCmdRunningTime << "\nCONVERT TIME: " << redisStringToDoubleConvertTime << "\n";
     cout << "\nAVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount;
     cout << "\nAVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount;
-    cout << "\n\nTOTAL PREPARE TIME: " << prepareTime << "\nTOTAL READ TIME: " << readTime << "\nTOTAL CALCULATION TIME: " << calculateTime << "\nFREE RUNNING CMD" << freeRunningTime;
+    cout << "\n\nTOTAL PREPARE TIME: " << prepareTime << "\nTOTAL READ TIME: " << readTime << "\nTOTAL CALCULATION TIME: " << calculateTime << "\nFREE RUNNING CMD: " << freeRunningTime;
+    cout << "\n\nCACHE TIME: " << cacheTime << "\n";
+    cout << "\nREDIS READ TIME: " << redisReadTime << "\n";
     freopen("result_redis_10e6.out", "w", stdout);
     for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
     debugTime("Done!");

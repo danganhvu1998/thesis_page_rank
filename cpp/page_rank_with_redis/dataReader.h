@@ -10,6 +10,7 @@ long long const maxNodes = 100000000007; // 1e11
 long long const maxCaches = 50000007; // 5 * 1e7
 std::map<long long, double> nodesCache;
 std::map<long long, double>::iterator it;
+double cacheTime, redisReadTime;
 
 
 double getValueFromCache(long long nodeId, long long roundId) {
@@ -45,12 +46,15 @@ double* getNodesVal(long long* nodesId, long long nodesCount, long long roundId)
     double* res = (double*)malloc(nodesCount * sizeof(double));
     long long notCachedNodesCount = 0;
     // Check Cache
+    auto t_start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < nodesCount; i++) {
         res[i] = getValueFromCache(nodesId[i], roundId);
         if (res[i] < 0) {  // Not found
             ++notCachedNodesCount;
         }
     }
+    auto t_end = std::chrono::high_resolution_clock::now();
+    cacheTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
     if (debugLevel >= 20) {
         printf("getNodesVal->[notCachedNodesCount, nodeCached]: %lld %lld\n", notCachedNodesCount, nodesCount - notCachedNodesCount);
     }
@@ -65,7 +69,10 @@ double* getNodesVal(long long* nodesId, long long nodesCount, long long roundId)
             ++currPos;
         }
     }
+    t_start = std::chrono::high_resolution_clock::now();
     double* resultFromRedis = getNodesValRedis(notCachedNodesId, notCachedNodesCount, roundId);
+    t_end = std::chrono::high_resolution_clock::now();
+    redisReadTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
     currPos = 0;
     for (int i = 0; i < nodesCount; i++) {
         if (res[i] < 0) {  // Not found
