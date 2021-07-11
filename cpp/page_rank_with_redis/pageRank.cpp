@@ -14,11 +14,12 @@ using namespace std;
 #define for0(i, n) for (long long i = 0; i < n; i++)
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
-long long const MAX_ROUND = 5;
+long long const MAX_ROUND = 10;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
-double readTime, calculateTime, prepareTime, freeRunningTime;
+double readTime, calculateTime, prepareTime, totalRoundTime, roundTime;
+vector<double> runningTimesByRound;
 
 void debugTime(string debugString) {
     auto currTime = chrono::system_clock::now();
@@ -57,10 +58,7 @@ void calculation(long long round) {
         }
         t_end = std::chrono::high_resolution_clock::now();
         calculateTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
-        t_start = std::chrono::high_resolution_clock::now();
         free(values);
-        t_end = std::chrono::high_resolution_clock::now();
-        freeRunningTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         setNodeVal(i, weight, round);
     }
 }
@@ -75,10 +73,29 @@ bool isAcceptErrorSatisfied() {
     return true;
 }
 
+void __report() {
+    cout << "\n### SIZE: NODE_COUNT: " << N << "; EDGE_COUNT:" << M;
+    cout << "\n\n ### REDIS COMMAND:\n";
+    cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount;
+    cout << "\n  + SET CMD RUNNING TIME: " << redisGetCmdRunningTime << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount;
+
+    cout << "\n\n ### RUNNING TIME BY FUNCTIONS:\n";
+    cout << "\n  + TOTAL READ TIME: " << readTime;
+    cout << "\n    + CACHE TIME: " << cacheTime;
+    cout << "\n    + REDIS READ TIME: " << redisReadTime;
+    cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime;
+
+    cout << "\n\n ### RUNNING TIME BY ROUND:\n";
+    cout << "\n  + ALL ROUNDS: " << totalRoundTime << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size();
+    for (int i = 0; i < runningTimesByRound.size(); i++) {
+        cout << "\n     + ROUND " << i + 1 << ":" << runningTimesByRound[i];
+    }
+}
+
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("graph_10e5.out", "r", stdin);
+    freopen("graph_1000.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);
@@ -93,19 +110,20 @@ int main() {
     // INIT WEIGHT
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
+        auto r_start = std::chrono::high_resolution_clock::now();
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
         debugTime("Done round " + to_string(i));
         lastRound = i;
+        auto r_end = std::chrono::high_resolution_clock::now();
+        roundTime += std::chrono::duration<double, std::milli>(r_end - r_start).count();
+        runningTimesByRound.push_back(roundTime);
+        totalRoundTime += roundTime;
     }
-    cout << '\n' << lastRound << " " << redisGetCount << " " << redisSetCount << " " << redisCommandCount;
-    cout << "\nSET CMD RUNNING TIME: " << redisSetCmdRunningTime << "\nGET CMD RUNNING TIME: " << redisGetCmdRunningTime << "\nCONVERT TIME: " << redisStringToDoubleConvertTime << "\n";
-    cout << "\nAVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount;
-    cout << "\nAVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount;
-    cout << "\n\nTOTAL PREPARE TIME: " << prepareTime << "\nTOTAL READ TIME: " << readTime << "\nTOTAL CALCULATION TIME: " << calculateTime << "\nFREE RUNNING CMD: " << freeRunningTime;
-    cout << "\n\nCACHE TIME: " << cacheTime << "\n";
-    cout << "\nREDIS READ TIME: " << redisReadTime << "\n";
-    freopen("result_redis_10e6.out", "w", stdout);
-    for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
-    debugTime("Done!");
+    __report();
+    // freopen("result_redis_10e6.out", "w", stdout);
+    // for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
+    freopen("run_time_result.md", "w", stdout);
+    __report();
+    // debugTime("Done!");
 }
