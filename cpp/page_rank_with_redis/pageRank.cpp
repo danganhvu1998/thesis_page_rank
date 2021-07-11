@@ -73,8 +73,15 @@ bool isAcceptErrorSatisfied() {
     return true;
 }
 
+int currentDateTime() {
+    return time(0);  // t is an integer type
+}
+
 void __report() {
-    cout << "\n### SIZE: NODE_COUNT: " << N << "; EDGE_COUNT:" << M;
+
+    cout << "\n# SIZE: NODE_COUNT: " << N << "; EDGE_COUNT: " << M << "; ROUND_COUNT: " << MAX_ROUND << "; WORKER_COUNT: " << workersCount << "; WORKER_ID: " << localWorkerId;
+
+    cout << "\n\n## REPORT BY RUNNING TIME (MS)";
     cout << "\n\n ### REDIS COMMAND:\n";
     cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount;
     cout << "\n  + SET CMD RUNNING TIME: " << redisGetCmdRunningTime << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount;
@@ -88,8 +95,26 @@ void __report() {
     cout << "\n\n ### RUNNING TIME BY ROUND:\n";
     cout << "\n  + ALL ROUNDS: " << totalRoundTime << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size();
     for (int i = 0; i < runningTimesByRound.size(); i++) {
-        cout << "\n     + ROUND " << i + 1 << ":" << runningTimesByRound[i];
+        cout << "\n     + ROUND " << i + 1 << ": " << runningTimesByRound[i];
     }
+
+    cout << "\n\n## REPORT BY PERCENTAGE RUNNING TIME";
+    cout << "\n\n ### REDIS COMMAND:\n";
+    cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount / totalRoundTime * 100;
+    cout << "\n  + SET CMD RUNNING TIME: " << redisGetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount / totalRoundTime * 100;
+
+    cout << "\n\n ### RUNNING TIME BY FUNCTIONS:\n";
+    cout << "\n  + TOTAL READ TIME: " << readTime / totalRoundTime * 100;
+    cout << "\n    + CACHE TIME: " << cacheTime / totalRoundTime * 100;
+    cout << "\n    + REDIS READ TIME: " << redisReadTime / totalRoundTime * 100;
+    cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime / totalRoundTime * 100;
+
+    cout << "\n\n ### RUNNING TIME BY ROUND:\n";
+    cout << "\n  + ALL ROUNDS: " << totalRoundTime / totalRoundTime * 100 << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size() / totalRoundTime * 100;
+    for (int i = 0; i < runningTimesByRound.size(); i++) {
+        cout << "\n     + ROUND " << i + 1 << ": " << runningTimesByRound[i] / totalRoundTime * 100;
+    }
+    cout << "\n\n";
 }
 
 int main() {
@@ -111,19 +136,21 @@ int main() {
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
         auto r_start = std::chrono::high_resolution_clock::now();
+        nodesCache.clear();
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
         debugTime("Done round " + to_string(i));
         lastRound = i;
         auto r_end = std::chrono::high_resolution_clock::now();
-        roundTime += std::chrono::duration<double, std::milli>(r_end - r_start).count();
+        roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
         runningTimesByRound.push_back(roundTime);
         totalRoundTime += roundTime;
     }
     __report();
-    // freopen("result_redis_10e6.out", "w", stdout);
-    // for0(i, N) cout << getNodeVal(i, lastRound) << ' ';
-    freopen("run_time_result.md", "w", stdout);
+    char* fileName = (char*)malloc(100);
+    snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%d.md", N, M, time(0));
+    freopen(fileName, "w", stdout);
     __report();
+    for0(i, 20) cout << getNodeVal(i, lastRound) << ' '; // To make sure the result is correct
     // debugTime("Done!");
 }
