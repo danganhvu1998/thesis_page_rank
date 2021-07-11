@@ -14,7 +14,7 @@ using namespace std;
 #define for0(i, n) for (long long i = 0; i < n; i++)
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
-long long const MAX_ROUND = 10;
+long long const MAX_ROUND = 7;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
@@ -120,7 +120,7 @@ void __report() {
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("graph_1000.data", "r", stdin);
+    freopen("graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);
