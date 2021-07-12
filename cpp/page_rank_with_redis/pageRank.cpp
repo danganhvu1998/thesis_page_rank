@@ -120,7 +120,7 @@ void __report() {
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("graph_10e5.out", "r", stdin);
+    freopen("graph_10e6.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);
