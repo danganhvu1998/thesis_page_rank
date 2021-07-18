@@ -5,33 +5,6 @@
 
 using namespace std;
 
-#define II pair<long long, long long>
-#define III pair<II, long long>
-#define X first.first
-#define Y first.second
-#define Z second
-#define all(a) (a).begin(), (a).end()
-#define for0(i, n) for (long long i = 0; i < n; i++)
-#define for1(i, n) for (long long i = 1; i <= n; i++)
-
-long long const MAX_ROUND = 7;
-double const ACCEPT_ERROR = 0.0001;
-long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
-long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
-double readTime, calculateTime, prepareTime, totalRoundTime, roundTime, setTime;
-vector<double> runningTimesByRound;
-
-void debugTime(string debugString) {
-    auto currTime = chrono::system_clock::now();
-    time_t humanTime = chrono::system_clock::to_time_t(currTime);
-    cout << "At " << ctime(&humanTime) << "    " << debugString << "\n";
-}
-
-vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
-long long toNodesCount[MAXIMUM_NODE_SUPPORT];
-long long N, M;
-long long lastRound = 0;
-
 void calculation(long long round) {
     int lastRound = round - 1;
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) {
@@ -76,56 +49,10 @@ bool isAcceptErrorSatisfied() {
     return true;
 }
 
-int currentDateTime() {
-    return time(0);  // t is an integer type
-}
-
-void __report() {
-
-    cout << "\n# SIZE: NODE_COUNT: " << N << "; EDGE_COUNT: " << M << "; ROUND_COUNT: " << MAX_ROUND << "; WORKER_COUNT: " << workersCount << "; WORKER_ID: " << localWorkerId;
-
-    cout << "\n\n## REPORT BY RUNNING TIME (MS)";
-    cout << "\n\n ### REDIS COMMAND:\n";
-    cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount;
-    cout << "\n  + SET CMD RUNNING TIME: " << redisGetCmdRunningTime << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount;
-
-    cout << "\n\n ### RUNNING TIME BY FUNCTIONS:\n";
-    cout << "\n  + TOTAL READ TIME: " << readTime;
-    cout << "\n    + CACHE TIME: " << cacheTime;
-    cout << "\n    + REDIS READ TIME: " << redisReadTime;
-    cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime;
-    cout << "\n  + TOTAL SET TIME: " << setTime;
-
-    cout << "\n\n ### RUNNING TIME BY ROUND:\n";
-    cout << "\n  + ALL ROUNDS: " << totalRoundTime << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size();
-    for (int i = 0; i < runningTimesByRound.size(); i++) {
-        cout << "\n     + ROUND " << i + 1 << ": " << runningTimesByRound[i];
-    }
-
-    cout << "\n\n## REPORT BY PERCENTAGE RUNNING TIME";
-    cout << "\n\n ### REDIS COMMAND:\n";
-    cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount / totalRoundTime * 100;
-    cout << "\n  + GET CMD RUNNING TIME: " << redisGetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount / totalRoundTime * 100;
-
-    cout << "\n\n ### RUNNING TIME BY FUNCTIONS:\n";
-    cout << "\n  + TOTAL READ TIME: " << readTime / totalRoundTime * 100;
-    cout << "\n    + CACHE TIME: " << cacheTime / totalRoundTime * 100;
-    cout << "\n    + REDIS READ TIME: " << redisReadTime / totalRoundTime * 100;
-    cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime / totalRoundTime * 100;
-    cout << "\n  + TOTAL SET TIME: " << setTime / totalRoundTime * 100;;
-
-    cout << "\n\n ### RUNNING TIME BY ROUND:\n";
-    cout << "\n  + ALL ROUNDS: " << totalRoundTime / totalRoundTime * 100 << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size() / totalRoundTime * 100;
-    for (int i = 0; i < runningTimesByRound.size(); i++) {
-        cout << "\n     + ROUND " << i + 1 << ": " << runningTimesByRound[i] / totalRoundTime * 100;
-    }
-    cout << "\n\n";
-}
-
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("data/graph_10e5.out", "r", stdin);
+    freopen("data/graph_1000.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);

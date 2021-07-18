@@ -10,7 +10,6 @@ long long const maxNodes = 100000000007; // 1e11
 long long const maxCaches = 50000007; // 5 * 1e7
 std::map<long long, double> nodesCache;
 std::map<long long, double>::iterator it;
-double cacheTime, redisReadTime;
 
 
 double getValueFromCache(long long nodeId, long long roundId) {

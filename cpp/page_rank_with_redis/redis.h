@@ -2,44 +2,9 @@
 #include <bits/stdc++.h>
 #include <unistd.h>
 #include <hiredis/hiredis.h>
+#include "utils.h"
 
 using namespace std;
-long long const MAX_WORKERS = 100;
-long long const MAX_THREADS = 15;
-long long CURRENT_THREAD = 0;
-
-redisContext* local = redisConnect("127.0.0.1", 6379);
-redisContext* workersContext[MAX_WORKERS][MAX_THREADS];
-long long workersCount = 1;
-long long maxThreads = 1;
-char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
-long long workersNodeStart[MAX_WORKERS] = { 0, 2500000 };
-long long workersNodeEnd[MAX_WORKERS] = { 2500000, 9999999 };
-long long localWorkerStartNode, localWorkerEndNode;
-long long localWorkerId = 0;
-long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
-long long debugLevel = 100;
-double redisSetCmdRunningTime, redisGetCmdRunningTime, redisStringToDoubleConvertTime;
-
-void debugRedisReply(redisReply* reply, char* command = "") {
-    if (debugLevel >= 10) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %ld;", command, reply, reply->elements);
-}
-
-void printRedisReply(redisReply* reply, char* startStr = "") {
-    printf("%s================================================\n", startStr);
-    printf("%sTYPE: %d\n", startStr, reply->type);
-    printf("%sINTEGER: %lld\n", startStr, reply->integer);
-    printf("%sSTRING: %s\n", startStr, reply->str);
-    printf("%sELEMENTS: %ld\n", startStr, reply->elements);
-    for (long long i = 0; i < reply->elements; i++) {
-        printRedisReply(reply->element[i], "____ ");
-    }
-    printf("%s================================================\n", startStr);
-}
-
-bool isEqual(double a, double b, double acceptError = 0.00001) {
-    return abs(a - b) < acceptError;
-}
 
 char* getValName(long long nodeId, long long roundId) {
     // char* res = new char[255];
@@ -96,6 +61,7 @@ void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId, 
     free(command);
     // command = new char[5 + 28 * reply->elements];
     command = (char*)malloc(5 + 28 * reply->elements * sizeof(char));
+    // TODO: use something faster than strcpy
     strcpy(command, "DEL ");
     for (long long i = 0; i < reply->elements; i++) {
         strcat(command, reply->element[i]->str);
