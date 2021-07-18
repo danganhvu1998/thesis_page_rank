@@ -101,7 +101,7 @@ void __report() {
     cout << "\n\n## REPORT BY PERCENTAGE RUNNING TIME";
     cout << "\n\n ### REDIS COMMAND:\n";
     cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount / totalRoundTime * 100;
-    cout << "\n  + SET CMD RUNNING TIME: " << redisGetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount / totalRoundTime * 100;
+    cout << "\n  + GET CMD RUNNING TIME: " << redisGetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount / totalRoundTime * 100;
 
     cout << "\n\n ### RUNNING TIME BY FUNCTIONS:\n";
     cout << "\n  + TOTAL READ TIME: " << readTime / totalRoundTime * 100;
@@ -120,7 +120,7 @@ void __report() {
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("data/soc-LiveJournal1.out", "r", stdin);
+    freopen("data/graph_1000.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);
@@ -145,10 +145,11 @@ int main() {
         roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
         runningTimesByRound.push_back(roundTime);
         totalRoundTime += roundTime;
+        __report();
     }
     __report();
     char* fileName = (char*)malloc(100);
-    snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%d_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
+    snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
     freopen(fileName, "w", stdout);
     __report();
     for0(i, 20) cout << getNodeVal(i, lastRound) << ' '; // To make sure the result is correct
