@@ -18,7 +18,7 @@ long long const MAX_ROUND = 7;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
-double readTime, calculateTime, prepareTime, totalRoundTime, roundTime;
+double readTime, calculateTime, prepareTime, totalRoundTime, roundTime, setTime;
 vector<double> runningTimesByRound;
 
 void debugTime(string debugString) {
@@ -59,7 +59,10 @@ void calculation(long long round) {
         t_end = std::chrono::high_resolution_clock::now();
         calculateTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         free(values);
+        t_start = std::chrono::high_resolution_clock::now();
         setNodeVal(i, weight, round);
+        t_end = std::chrono::high_resolution_clock::now();
+        setTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
     }
 }
 
@@ -91,6 +94,7 @@ void __report() {
     cout << "\n    + CACHE TIME: " << cacheTime;
     cout << "\n    + REDIS READ TIME: " << redisReadTime;
     cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime;
+    cout << "\n  + TOTAL SET TIME: " << setTime;
 
     cout << "\n\n ### RUNNING TIME BY ROUND:\n";
     cout << "\n  + ALL ROUNDS: " << totalRoundTime << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size();
@@ -108,6 +112,7 @@ void __report() {
     cout << "\n    + CACHE TIME: " << cacheTime / totalRoundTime * 100;
     cout << "\n    + REDIS READ TIME: " << redisReadTime / totalRoundTime * 100;
     cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime / totalRoundTime * 100;
+    cout << "\n  + TOTAL SET TIME: " << setTime / totalRoundTime * 100;;
 
     cout << "\n\n ### RUNNING TIME BY ROUND:\n";
     cout << "\n  + ALL ROUNDS: " << totalRoundTime / totalRoundTime * 100 << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size() / totalRoundTime * 100;
@@ -120,7 +125,7 @@ void __report() {
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("data/graph_1000.data", "r", stdin);
+    freopen("data/graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);
@@ -135,6 +140,7 @@ int main() {
     // INIT WEIGHT
     for0(i, N) setNodeVal(i, 1.0, 0);
     for1(i, MAX_ROUND) {
+        debugTime("Start round " + to_string(i));
         auto r_start = std::chrono::high_resolution_clock::now();
         nodesCache.clear();
         if (i >= 3) delAllNodesAtRound(i - 3);
@@ -145,7 +151,7 @@ int main() {
         roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
         runningTimesByRound.push_back(roundTime);
         totalRoundTime += roundTime;
-        __report();
+        // __report();
     }
     __report();
     char* fileName = (char*)malloc(100);
