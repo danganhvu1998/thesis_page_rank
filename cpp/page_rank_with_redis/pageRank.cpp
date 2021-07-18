@@ -120,7 +120,7 @@ void __report() {
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("soc-LiveJournal1.out", "r", stdin);
+    freopen("data/soc-LiveJournal1.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);
