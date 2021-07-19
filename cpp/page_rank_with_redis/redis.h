@@ -31,7 +31,7 @@ char* getValsCommand(long long* nodesId, long long nodesCount, long long roundId
     strcpy(res, "MGET ");
     for (long long i = 0; i < nodesCount; i++) {
         char* valName = getValName(nodesId[i], roundId);
-        strcat(res, valName);
+        strCat(res, valName);
         free(valName);
     }
     return res;
@@ -44,7 +44,7 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
     strcpy(res, "DEL ");
     for (long long i = 0; i < nodesCount; i++) {
         char* valName = getValName(nodesId[i], roundId);
-        strcat(res, valName);
+        strCat(res, valName);
         free(valName);
     }
     ++redisCommandCount;
@@ -64,8 +64,8 @@ void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId, 
     // TODO: use something faster than strcpy
     strcpy(command, "DEL ");
     for (long long i = 0; i < reply->elements; i++) {
-        strcat(command, reply->element[i]->str);
-        strcat(command, " ");
+        strCat(command, reply->element[i]->str);
+        strCat(command, " ");
     }
     if (debugLevel >= 20) printf("delAllNodesAtRound->command: %s\n", command);
     freeReplyObject(reply);
@@ -81,7 +81,7 @@ char* setValsCommand(long long* nodesId, double* values, long long nodesCount, l
     strcpy(res, "MSET ");
     for (long long i = 0; i < nodesCount; i++) {
         char* setPath = getSetPath(nodesId[i], values[i], roundId);
-        strcat(res, setPath);
+        strCat(res, setPath);
         free(setPath);
     }
     return res;

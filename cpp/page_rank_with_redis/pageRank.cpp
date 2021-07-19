@@ -52,7 +52,7 @@ bool isAcceptErrorSatisfied() {
 int main() {
     getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
-    freopen("data/graph_1000.data", "r", stdin);
+    freopen("data/graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N);

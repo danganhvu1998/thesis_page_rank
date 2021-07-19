@@ -124,3 +124,13 @@ void printRedisReply(redisReply* reply, char* startStr = "") {
 bool isEqual(double a, double b, double acceptError = 0.00001) {
     return abs(a - b) < acceptError;
 }
+
+void strCat(char* destString, char* srcString) {
+    int currPos = strlen(destString);
+    int srcLen = strlen(srcString);
+    for (int i = 0; i < srcLen; i++) {
+        destString[currPos] = srcString[i];
+        ++currPos;
+    }
+    destString[currPos] = '\0';
+}
