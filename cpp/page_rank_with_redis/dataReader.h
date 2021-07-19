@@ -8,8 +8,8 @@ long long currentRoundId = 0;
 long long const maxNodes = 100000000007; // 1e11
 // TODO: Get ram size and use only 20-30% of it
 long long const maxCaches = 50000007; // 5 * 1e7
-std::map<long long, double> nodesCache;
-std::map<long long, double>::iterator it;
+std::unordered_map<long long, double> nodesCache;
+std::unordered_map<long long, double>::iterator it;
 
 
 double getValueFromCache(long long nodeId, long long roundId) {
