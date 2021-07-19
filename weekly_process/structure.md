@@ -1,10 +1,10 @@
 ## Overall Structure, Connection
 
-+ ![Error](./images/4workers.svg)
++ ![Error](./images/4workers.png)
 
 ## Connection in detail
 
-![Error](./images/1worker.svg)
+![Error](./images/1worker.png)
 
 + Connection (1): Between `Processor` and `Data Reader`
   + GET: `Data Reader` answers request from processor about requested data. `Processor` will ask question like: What is the value of ```nodesList = [1, 4, 400, 123104, 6021998, 20041998]``` after ```round = 15```. Processor will not care if all the nodes are from the same workers, or in different workers.
