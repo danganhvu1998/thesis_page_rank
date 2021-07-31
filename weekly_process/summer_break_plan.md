@@ -7,3 +7,4 @@
 ## Other Targets
 
 + Auto setup with minimal configuration
++ Check cache hit percentage
