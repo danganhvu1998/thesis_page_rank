@@ -128,8 +128,7 @@ double* executeGetValsCommand(char* command, long long contextId = localWorkerId
     return res;
 }
 
-void executeSetValsCommand(char* command, long long contextId = localWorkerId, long long currThread = 0) {
-    redisContext* context = workersContext[contextId][currThread];
+void executeSetValsCommand(char* command, redisContext* context = local, long long currThread = 0) {
     if (debugLevel >= 10) {
         printf("executeSetValsCommand->command: %s\n", command);
     }
@@ -201,8 +200,9 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
 }
 
 void distributeTask() {
-    redisReply* reply = (redisReply*)redisCommand(local, "GET WORKERS_IP_ADDRESSES");
+    redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
     workersCount = split(reply->str, ",", ip);
+    freeReplyObject(reply);
     int startNode = 0, endNode = 0;
     for (int i = 0; i < workersCount; i++) {
         startNode = endNode;
@@ -213,6 +213,26 @@ void distributeTask() {
             currentRoundId, startNode,
             currentRoundId, endNode
         );
+        // printf("\nIP %d: %s: %d %d", i, currWorker.ip, startNode, endNode);
+    }
+}
+
+void getTask() {
+    if (!strcmp(LOCAL_IP_ADDRESS, MAIN_WORKER_IP_ADDRESS)) {
+        distributeTask();
+    }
+    redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
+    workersCount = split(reply->str, ",", ip);
+    freeReplyObject(reply);
+    for (int i = 0; i < workersCount; i++) {
+        worker currWorker = getWorkerById(i);
+        reply = (redisReply*)redisCommand(
+            currWorker.redis, "MGET ROUND_%lld_START_NODE  ROUND_%lld_END_NODE ",
+            currentRoundId, currentRoundId
+        );
+        currWorker.startNode = atoi(reply->element[0]->str);
+        currWorker.endNode = atoi(reply->element[1]->str);
+        printWorker(currWorker);
         // printf("\nIP %d: %s: %d %d", i, currWorker.ip, startNode, endNode);
     }
 }

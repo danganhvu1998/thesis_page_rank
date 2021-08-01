@@ -52,13 +52,9 @@ bool isAcceptErrorSatisfied() {
 int main() {
     redisCommand(local, "FLUSHALL");
     getRunningEnv(); debugLevel = 1;
-    freopen("data/graph_10e6.out", "r", stdin);
+    freopen("data/graph_1000.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
-    if (!strcmp(LOCAL_IP_ADDRESS, MAIN_WORKER_IP_ADDRESS)) {
-        distributeTask();
-    }
-    return 0;
     localWorkerEndNode = min(localWorkerEndNode, N);
     for0(i, N) toNodesCount[i] = 0;
     for0(i, M) {
@@ -70,25 +66,27 @@ int main() {
     debugTime("Done Reading");
     // INIT WEIGHT
     for0(i, N) setNodeVal(i, 1.0, 0);
+    debugTime("Done INIT");
     for1(i, MAX_ROUND) {
-        debugTime("Start round " + to_string(i));
-        auto r_start = std::chrono::high_resolution_clock::now();
-        nodesCache.clear();
-        if (i >= 3) delAllNodesAtRound(i - 3);
-        calculation(i);
-        debugTime("Done round " + to_string(i));
-        lastRound = i;
-        auto r_end = std::chrono::high_resolution_clock::now();
-        roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
-        runningTimesByRound.push_back(roundTime);
-        totalRoundTime += roundTime;
+        getTask();
+        // debugTime("Start round " + to_string(i));
+        // auto r_start = std::chrono::high_resolution_clock::now();
+        // nodesCache.clear();
+        // if (i >= 3) delAllNodesAtRound(i - 3);
+        // calculation(i);
+        // debugTime("Done round " + to_string(i));
+        // lastRound = i;
+        // auto r_end = std::chrono::high_resolution_clock::now();
+        // roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
+        // runningTimesByRound.push_back(roundTime);
+        // totalRoundTime += roundTime;
         // __report();
     }
-    __report();
-    char* fileName = (char*)malloc(100);
-    snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
-    freopen(fileName, "w", stdout);
-    __report();
-    for0(i, 20) cout << getNodeVal(i, lastRound) << ' '; // To make sure the result is correct
+    // __report();
+    // char* fileName = (char*)malloc(100);
+    // snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
+    // freopen(fileName, "w", stdout);
+    // __report();
+    // for0(i, 20) cout << getNodeVal(i, lastRound) << ' '; // To make sure the result is correct
     // debugTime("Done!");
 }
