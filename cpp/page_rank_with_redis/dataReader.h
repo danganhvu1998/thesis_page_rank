@@ -4,10 +4,6 @@
 
 #define II pair<int, int>
 
-long long currentRoundId = 0;
-long long const maxNodes = 100000000007; // 1e11
-// TODO: Get ram size and use only 20-30% of it
-long long const maxCaches = 50000007; // 5 * 1e7
 std::unordered_map<long long, double> nodesCache;
 std::unordered_map<long long, double>::iterator it;
 

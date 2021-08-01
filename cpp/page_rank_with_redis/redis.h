@@ -200,22 +200,39 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
     return result;
 }
 
+void distributeTask() {
+    redisReply* reply = (redisReply*)redisCommand(local, "GET WORKERS_IP_ADDRESSES");
+    workersCount = split(reply->str, ",", ip);
+    int startNode = 0, endNode = 0;
+    for (int i = 0; i < workersCount; i++) {
+        startNode = endNode;
+        endNode = startNode + M / workersCount + 10;
+        worker currWorker = getWorkerById(i);
+        (redisReply*)redisCommand(
+            currWorker.redis, "MSET ROUND_%lld_START_NODE %lld ROUND_%lld_END_NODE %lld",
+            currentRoundId, startNode,
+            currentRoundId, endNode
+        );
+    }
+}
+
 void getRunningEnv() {
     long long startNode, endNode;
-    // freopen(".env", "r", stdin);
-    // cin >> workersCount;
-    maxThreads = 1;
-    for (long long i = 0; i < workersCount; i++) {
-        for (long long j = 0; j < maxThreads; j++) {
-            workersContext[i][j] = redisConnect(ip[i], 6379);
-            printf("CONTEXT: %p; i,j: %lld %lld\n", workersContext[i][j], i, j);
-            redisReply* reply = (redisReply*)redisCommand(workersContext[i][j], "PING");
-            printRedisReply(reply);
-            freeReplyObject(reply);
-        }
-    }
-    localWorkerStartNode = workersNodeStart[localWorkerId];
-    localWorkerEndNode = workersNodeEnd[localWorkerId];
+    char* command = (char*)malloc(500);
+    sprintf(command, "APPEND WORKERS_IP_ADDRESSES \"%s,\"", LOCAL_IP_ADDRESS);
+    redisCommand(mainWorkerRedis, command);
+    sprintf(
+        command, "MSET %s_COMPUTE_TIME_LAST_ROUND 0 %s_RAM_SIZE %lf %s_CLOCK_RATE %lf %s_CORES_COUNT %lld %s_IP_ADDRESS %lf",
+        LOCAL_IP_ADDRESS,
+        LOCAL_IP_ADDRESS, RAM_SIZE_GB,
+        LOCAL_IP_ADDRESS, CLOCK_RATE_GHZ,
+        LOCAL_IP_ADDRESS, PHYSICAL_CORES_COUNT,
+        LOCAL_IP_ADDRESS, LOCAL_IP_ADDRESS
+    );
+    (redisReply*)redisCommand(mainWorkerRedis, command);
+    // if (!strcmp(LOCAL_IP_ADDRESS, MAIN_WORKER_IP_ADDRESS)) {
+    //     distributeTask();
+    // }
 }
 
 bool __testRedis() {

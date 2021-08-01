@@ -13,6 +13,13 @@ using namespace std;
 #define for0(i, n) for (long long i = 0; i < n; i++)
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
+typedef struct _worker {
+    char* ip;
+    redisContext* redis;
+    double clockRate, ram, coresCount, lastRoundRunningTime;
+    long long startNode, endNode;
+} worker;
+
 // SETTING PARAMS
 long long const MAX_ROUND = 7;
 double const ACCEPT_ERROR = 0.0001;
@@ -22,15 +29,17 @@ long long const MAX_WORKERS = 100;
 long long const MAX_THREADS = 15;
 
 // Setting workers
-char* ip[MAX_WORKERS] = { "192.168.1.64", "192.168.1.89" };
-long long workersNodeStart[MAX_WORKERS] = { 0, 2500000 };
-long long workersNodeEnd[MAX_WORKERS] = { 2500000, 9999999 };
+char* ip[MAX_WORKERS];
+long long workersNodeStart[MAX_WORKERS];
+long long workersNodeEnd[MAX_WORKERS];
 long long workersCount = 1;
 long long maxThreads = 1;
 
 // For redis communication
 redisContext* local = redisConnect("127.0.0.1", 6379);
+redisContext* mainWorkerRedis = redisConnect(MAIN_WORKER_IP_ADDRESS, 6379);
 redisContext* workersContext[MAX_WORKERS][MAX_THREADS];
+worker workersList[MAX_WORKERS];
 
 // VARIABLES
 vector<double> runningTimesByRound;
@@ -51,6 +60,12 @@ long long debugLevel = 100;
 // For checking running status
 double readTime, calculateTime, prepareTime, totalRoundTime, roundTime, setTime, cacheTime, redisReadTime;
 double redisSetCmdRunningTime, redisGetCmdRunningTime, redisStringToDoubleConvertTime;
+
+// 
+long long currentRoundId = 0;
+long long const maxNodes = 100000000007; // 1e11
+// TODO: Get ram size and use only 20-30% of it
+long long const maxCaches = 50000007; // 5 * 1e7
 
 
 
@@ -134,4 +149,37 @@ void strCat(char* destString, char* srcString) {
         ++currPos;
     }
     destString[currPos] = '\0';
+}
+
+int split(char* str, char* seperator, char** res) {
+    char* ptr = strtok(str, seperator);
+    int curr = 0;
+    while (ptr != NULL)
+    {
+        free(res[curr]);
+        res[curr] = new char[50];
+        strcpy(res[curr], ptr);
+        ++curr;
+        ptr = strtok(NULL, seperator);
+    }
+    return curr;
+}
+
+void createNewWorker(char* ipAddress, int pos) {
+    workersList[pos].ip = new char[50];
+    strcpy(workersList[pos].ip, ipAddress);
+    workersList[pos].redis = redisConnect(ipAddress, 6379);
+}
+
+worker getWorkerById(int id) {
+    if (workersList[id].ip == NULL) createNewWorker(ip[id], id);
+    return workersList[id];
+}
+
+worker getWorkerByIp(char* ipAddress) {
+    for (int i = 0; i < MAX_WORKERS;i++) {
+        if (!strcmp(workersList[i].ip, ipAddress)) {
+            return getWorkerById(i);
+        }
+    }
 }
