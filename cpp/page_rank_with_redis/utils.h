@@ -185,5 +185,5 @@ worker getWorkerByIp(char* ipAddress) {
 }
 
 void printWorker(worker w) {
-    printf("\n\nIP: %s\nSTART - END: %d - %d\n", w.ip, w.startNode, w.endNode);
+    printf("\n\nWORKER %s at ROUND %lld\nSTART - END: %d - %d\n", w.ip, currentRoundId, w.startNode, w.endNode);
 }

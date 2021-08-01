@@ -230,10 +230,16 @@ void getTask() {
             currWorker.redis, "MGET ROUND_%lld_START_NODE  ROUND_%lld_END_NODE ",
             currentRoundId, currentRoundId
         );
-        currWorker.startNode = atoi(reply->element[0]->str);
-        currWorker.endNode = atoi(reply->element[1]->str);
-        printWorker(currWorker);
-        // printf("\nIP %d: %s: %d %d", i, currWorker.ip, startNode, endNode);
+        if (reply->element[0]->str == NULL || reply->element[1]->str == NULL) {
+            --i;
+            printf("Not yet able to get task for round %lld of worker %s\n", currentRoundId, currWorker.ip);
+            usleep(500000);
+        }
+        else {
+            currWorker.startNode = atoi(reply->element[0]->str);
+            currWorker.endNode = atoi(reply->element[1]->str);
+            printWorker(currWorker);
+        }
     }
 }
 

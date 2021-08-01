@@ -7,6 +7,7 @@ using namespace std;
 
 void calculation(long long round) {
     int lastRound = round - 1;
+    currentRoundId = round;
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) {
         double weight = 0;
         // #################################
@@ -69,17 +70,18 @@ int main() {
     debugTime("Done INIT");
     for1(i, MAX_ROUND) {
         getTask();
-        // debugTime("Start round " + to_string(i));
-        // auto r_start = std::chrono::high_resolution_clock::now();
-        // nodesCache.clear();
-        // if (i >= 3) delAllNodesAtRound(i - 3);
-        // calculation(i);
-        // debugTime("Done round " + to_string(i));
-        // lastRound = i;
-        // auto r_end = std::chrono::high_resolution_clock::now();
-        // roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
-        // runningTimesByRound.push_back(roundTime);
-        // totalRoundTime += roundTime;
+        currentRoundId = i;
+        debugTime("Start round " + to_string(i));
+        auto r_start = std::chrono::high_resolution_clock::now();
+        nodesCache.clear();
+        if (i >= 3) delAllNodesAtRound(i - 3);
+        calculation(i);
+        debugTime("Done round " + to_string(i));
+        lastRound = i;
+        auto r_end = std::chrono::high_resolution_clock::now();
+        roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
+        runningTimesByRound.push_back(roundTime);
+        totalRoundTime += roundTime;
         // __report();
     }
     // __report();
