@@ -50,11 +50,15 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    getRunningEnv(); debugLevel = 1;
     redisCommand(local, "FLUSHALL");
+    getRunningEnv(); debugLevel = 1;
     freopen("data/graph_10e6.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
+    if (!strcmp(LOCAL_IP_ADDRESS, MAIN_WORKER_IP_ADDRESS)) {
+        distributeTask();
+    }
+    return 0;
     localWorkerEndNode = min(localWorkerEndNode, N);
     for0(i, N) toNodesCount[i] = 0;
     for0(i, M) {

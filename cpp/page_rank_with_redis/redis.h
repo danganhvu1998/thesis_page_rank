@@ -206,23 +206,24 @@ void distributeTask() {
     int startNode = 0, endNode = 0;
     for (int i = 0; i < workersCount; i++) {
         startNode = endNode;
-        endNode = startNode + M / workersCount + 10;
+        endNode = startNode + N / workersCount + 10;
         worker currWorker = getWorkerById(i);
         (redisReply*)redisCommand(
             currWorker.redis, "MSET ROUND_%lld_START_NODE %lld ROUND_%lld_END_NODE %lld",
             currentRoundId, startNode,
             currentRoundId, endNode
         );
+        // printf("\nIP %d: %s: %d %d", i, currWorker.ip, startNode, endNode);
     }
 }
 
 void getRunningEnv() {
     long long startNode, endNode;
     char* command = (char*)malloc(500);
-    sprintf(command, "APPEND WORKERS_IP_ADDRESSES \"%s,\"", LOCAL_IP_ADDRESS);
+    sprintf(command, "APPEND WORKERS_IP_ADDRESSES %s,", LOCAL_IP_ADDRESS);
     redisCommand(mainWorkerRedis, command);
     sprintf(
-        command, "MSET %s_COMPUTE_TIME_LAST_ROUND 0 %s_RAM_SIZE %lf %s_CLOCK_RATE %lf %s_CORES_COUNT %lld %s_IP_ADDRESS %lf",
+        command, "MSET %s_COMPUTE_TIME_LAST_ROUND 0 %s_RAM_SIZE %lf %s_CLOCK_RATE %lf %s_CORES_COUNT %d %s_IP_ADDRESS %s",
         LOCAL_IP_ADDRESS,
         LOCAL_IP_ADDRESS, RAM_SIZE_GB,
         LOCAL_IP_ADDRESS, CLOCK_RATE_GHZ,
