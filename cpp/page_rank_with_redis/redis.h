@@ -52,7 +52,7 @@ char* delValsCommand(long long* nodesId, long long nodesCount, long long roundId
 }
 
 void delAllNodesAtRound(long long roundId, long long contextId = localWorkerId, long long currThread = 0) {
-    redisContext* context = workersContext[contextId][currThread];
+    redisContext* context = workersList[contextId].redis;
     // char* command = new char[100];
     char* command = (char*)malloc(100 * sizeof(char));
     sprintf(command, "KEYS *_%lld", roundId);
@@ -88,7 +88,7 @@ char* setValsCommand(long long* nodesId, double* values, long long nodesCount, l
 }
 
 double* executeGetValsCommand(char* command, long long contextId = localWorkerId, long long currThread = 0) {
-    redisContext* context = workersContext[contextId][currThread];
+    redisContext* context = workersList[contextId].redis;
     if (debugLevel >= 20) {
         printf("executeGetValsCommand->command: %s\n", command);
     }
@@ -160,10 +160,10 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
     // TODO: Getting values from worker can work in parallel
     for (long long i = 0; i < workersCount; i++) {
         long long nodesInWorkersCount = 0;
-        for (long long j = 0; j < nodesCount; j++) if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) ++nodesInWorkersCount;
+        for (long long j = 0; j < nodesCount; j++) if (nodesId[j] >= workersList[i].startNode && nodesId[j] < workersList[i].endNode) ++nodesInWorkersCount;
         long long nodesInWorkers[nodesInWorkersCount], nextPos = 0, currPos = 0;
         for (long long j = 0; j < nodesCount; j++) {
-            if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) {
+            if (nodesId[j] >= workersList[i].startNode && nodesId[j] < workersList[i].endNode) {
                 nodesInWorkers[nextPos] = nodesId[j];
                 ++nextPos;
             }
@@ -178,7 +178,7 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
             bool isDone = true;
             currPos = 0;
             for (long long j = 0; j < nodesCount; j++) {
-                if (nodesId[j] >= workersNodeStart[i] && nodesId[j] < workersNodeEnd[i]) {
+                if (nodesId[j] >= workersList[i].startNode && nodesId[j] < workersList[i].endNode) {
                     if (res[currPos] < 0) isDone = false;
                     result[j] = res[currPos];
                     ++currPos;
@@ -239,6 +239,11 @@ void getTask() {
             currWorker.startNode = atoi(reply->element[0]->str);
             currWorker.endNode = atoi(reply->element[1]->str);
             printWorker(currWorker);
+            if (!strcmp(LOCAL_IP_ADDRESS, currWorker.ip)) {
+                localWorkerStartNode = currWorker.startNode;
+                localWorkerEndNode = currWorker.endNode;
+                localWorkerId = i;
+            }
         }
     }
 }

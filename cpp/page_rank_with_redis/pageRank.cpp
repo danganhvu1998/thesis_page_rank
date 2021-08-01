@@ -10,7 +10,7 @@ void calculation(long long round) {
     currentRoundId = round;
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) {
         double weight = 0;
-        // #################################
+        // Prepare nodes list that can to to i
         auto t_start = std::chrono::high_resolution_clock::now();
         long long* nodesId = new long long[edgesTo[i].size()];
         for0(j, edgesTo[i].size()) {
@@ -18,13 +18,13 @@ void calculation(long long round) {
         }
         auto t_end = std::chrono::high_resolution_clock::now();
         prepareTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
-        // #################################
+        // Get nodes value from last round
         t_start = std::chrono::high_resolution_clock::now();
         double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
         t_end = std::chrono::high_resolution_clock::now();
         readTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         free(nodesId);
-        // #################################
+        // Calculate value of node i in this round
         t_start = std::chrono::high_resolution_clock::now();
         for0(j, edgesTo[i].size()) {
             const int fromNode = edgesTo[i][j];
@@ -84,11 +84,11 @@ int main() {
         totalRoundTime += roundTime;
         // __report();
     }
-    // __report();
-    // char* fileName = (char*)malloc(100);
-    // snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
-    // freopen(fileName, "w", stdout);
-    // __report();
-    // for0(i, 20) cout << getNodeVal(i, lastRound) << ' '; // To make sure the result is correct
-    // debugTime("Done!");
+    __report();
+    char* fileName = (char*)malloc(100);
+    snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
+    freopen(fileName, "w", stdout);
+    __report();
+    for0(i, 20) cout << getNodeVal(i, lastRound) << ' '; // To make sure the result is correct
+    debugTime("Done!");
 }
