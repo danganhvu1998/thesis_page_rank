@@ -171,12 +171,12 @@ void createNewWorker(char* ipAddress, int pos) {
     workersList[pos].redis = redisConnect(ipAddress, 6379);
 }
 
-worker getWorkerById(int id) {
+int getWorkerById(int id) {
     if (workersList[id].ip == NULL) createNewWorker(ip[id], id);
-    return workersList[id];
+    return id;
 }
 
-worker getWorkerByIp(char* ipAddress) {
+int getWorkerByIp(char* ipAddress) {
     for (int i = 0; i < MAX_WORKERS;i++) {
         if (!strcmp(workersList[i].ip, ipAddress)) {
             return getWorkerById(i);

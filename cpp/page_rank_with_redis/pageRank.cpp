@@ -21,6 +21,9 @@ void calculation(long long round) {
         // Get nodes value from last round
         t_start = std::chrono::high_resolution_clock::now();
         double* values = getNodesVal(nodesId, edgesTo[i].size(), lastRound);
+        // for0(j, edgesTo[i].size()) {
+        //     cout << "ROUND " << round << ": " << i << " " << j << " " << edgesTo[i][j] << " " << values[j] << endl;
+        // }
         t_end = std::chrono::high_resolution_clock::now();
         readTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         free(nodesId);
@@ -62,15 +65,16 @@ int main() {
         long long a, b;
         cin >> a >> b; // From a we can go to b
         ++toNodesCount[a];
-        if (b >= localWorkerStartNode && b < localWorkerEndNode) edgesTo[b].push_back(a);
+        // if (b >= localWorkerStartNode && b < localWorkerEndNode) edgesTo[b].push_back(a);
+        edgesTo[b].push_back(a);
     }
     debugTime("Done Reading");
     // INIT WEIGHT
     for0(i, N) setNodeVal(i, 1.0, 0);
     debugTime("Done INIT");
     for1(i, MAX_ROUND) {
-        getTask();
         currentRoundId = i;
+        getTask();
         debugTime("Start round " + to_string(i));
         auto r_start = std::chrono::high_resolution_clock::now();
         nodesCache.clear();
