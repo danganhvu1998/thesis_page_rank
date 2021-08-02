@@ -54,7 +54,6 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    redisCommand(local, "FLUSHALL");
     getRunningEnv(); debugLevel = 1;
     freopen("data/graph_10e5.out", "r", stdin);
     // INPUT GRAPH
