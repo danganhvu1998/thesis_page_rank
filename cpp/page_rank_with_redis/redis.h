@@ -158,6 +158,7 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
     // double* result = new double[nodesCount];
     double* result = (double*)malloc(nodesCount * sizeof(double));
     // TODO: Getting values from worker can work in parallel
+    // TODO: Each round, start-end node for each worker might be different. Use data from last round to check where to ask for values.
     for (long long i = 0; i < workersCount; i++) {
         long long nodesInWorkersCount = 0;
         for (long long j = 0; j < nodesCount; j++) if (nodesId[j] >= workersList[i].startNode && nodesId[j] < workersList[i].endNode) ++nodesInWorkersCount;
