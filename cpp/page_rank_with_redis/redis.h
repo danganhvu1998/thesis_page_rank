@@ -249,6 +249,8 @@ void getTask() {
                 localWorkerStartNode = workersList[currWorkerId].startNode;
                 localWorkerEndNode = workersList[currWorkerId].endNode;
                 localWorkerId = i;
+                cout<<"LOCAL WORKER:\n";
+                printWorker(workersList[i]);
             }
         }
     }
