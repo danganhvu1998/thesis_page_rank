@@ -54,7 +54,8 @@ bool isAcceptErrorSatisfied() {
 }
 
 int main() {
-    getRunningEnv(); debugLevel = 1;
+    debugLevel = 1;
+    getRunningEnv(); // Annouce with main worker here
     freopen("data/graph_1000.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;

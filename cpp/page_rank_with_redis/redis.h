@@ -219,38 +219,47 @@ void distributeTask() {
         );
         // printf("\nIP %d: %s: %d %d", i, currWorker.ip, startNode, endNode);
     }
+    (redisReply*)redisCommand(mainWorkerRedis, "SET DISTRIBUTED_TASK_FOR_ROUND_%lld %lld", currentRoundId, 1);
 }
 
 void getTask() {
     if (!strcmp(LOCAL_IP_ADDRESS, MAIN_WORKER_IP_ADDRESS)) {
         distributeTask();
     }
-    redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
-    workersCount = split(reply->str, ",", ip);
-    // cout << "workersCount: " << workersCount << endl;
-    // for0(i, workersCount) cout << "ip: " << ip[i] << endl;
-    freeReplyObject(reply);
-    for (int i = 0; i < workersCount; i++) {
-        int currWorkerId = getWorkerById(i);
-        reply = (redisReply*)redisCommand(
-            workersList[currWorkerId].redis, "MGET ROUND_%lld_START_NODE  ROUND_%lld_END_NODE ",
-            currentRoundId, currentRoundId
-        );
-        if (reply->element[0]->str == NULL || reply->element[1]->str == NULL) {
-            --i;
-            printf("Not yet able to get task for round %lld of worker %s\n", currentRoundId, workersList[currWorkerId].ip);
+    while (1) {
+        redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET DISTRIBUTED_TASK_FOR_ROUND_%lld", currentRoundId);
+        if (reply->str == NULL) {
+            printf("Task for round %lld has not yet get distributed\n", currentRoundId);
             usleep(500000);
+            continue;
         }
-        else {
-            workersList[currWorkerId].startNode = atoi(reply->element[0]->str);
-            workersList[currWorkerId].endNode = atoi(reply->element[1]->str);
-            // printWorker(workersList[currWorkerId]);
-            if (!strcmp(LOCAL_IP_ADDRESS, workersList[currWorkerId].ip)) {
-                localWorkerStartNode = workersList[currWorkerId].startNode;
-                localWorkerEndNode = workersList[currWorkerId].endNode;
-                localWorkerId = i;
-                cout<<"LOCAL WORKER:\n";
-                printWorker(workersList[i]);
+        reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
+        workersCount = split(reply->str, ",", ip);
+        // cout << "workersCount: " << workersCount << endl;
+        // for0(i, workersCount) cout << "ip: " << ip[i] << endl;
+        freeReplyObject(reply);
+        for (int i = 0; i < workersCount; i++) {
+            int currWorkerId = getWorkerById(i);
+            reply = (redisReply*)redisCommand(
+                workersList[currWorkerId].redis, "MGET ROUND_%lld_START_NODE  ROUND_%lld_END_NODE ",
+                currentRoundId, currentRoundId
+            );
+            if (reply->element[0]->str == NULL || reply->element[1]->str == NULL) {
+                --i;
+                printf("Not yet able to get task for round %lld of worker %s\n", currentRoundId, workersList[currWorkerId].ip);
+                usleep(500000);
+            }
+            else {
+                workersList[currWorkerId].startNode = atoi(reply->element[0]->str);
+                workersList[currWorkerId].endNode = atoi(reply->element[1]->str);
+                // printWorker(workersList[currWorkerId]);
+                if (!strcmp(LOCAL_IP_ADDRESS, workersList[currWorkerId].ip)) {
+                    localWorkerStartNode = workersList[currWorkerId].startNode;
+                    localWorkerEndNode = workersList[currWorkerId].endNode;
+                    localWorkerId = i;
+                    cout << "LOCAL WORKER:\n";
+                    printWorker(workersList[i]);
+                }
             }
         }
     }
