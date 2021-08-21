@@ -67,6 +67,7 @@ long long const maxNodes = 100000000007; // 1e11
 // TODO: Get ram size and use only 20-30% of it
 long long const maxCaches = 50000007; // 5 * 1e7
 int cacheHitCount = 0, cacheMissCount = 0, reportCacheHitAfterTimes = 1000; // Set to -1 to have no report
+vector<int> cacheHitByRound[MAX_ROUND + 2];
 
 
 int currentDateTime() {
@@ -112,7 +113,12 @@ void __report() {
     for (int i = 0; i < runningTimesByRound.size(); i++) {
         cout << "\n     + ROUND " << i + 1 << ": " << runningTimesByRound[i] / totalRoundTime * 100;
     }
-    cout << "\n\n";
+    cout << "\n\n ### CACHE HIT RATE:\n";
+    for1(i, MAX_ROUND) {
+        cout << "\n ROUND: " << i << " ";
+        for0(j, cacheHitByRound[i].size) cout << cacheHitByRound[i][j] << " ";
+    }
+
 }
 
 void debugTime(string debugString) {

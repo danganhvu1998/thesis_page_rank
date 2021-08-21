@@ -11,11 +11,7 @@ std::unordered_map<long long, double>::iterator it;
 double getValueFromCache(long long nodeId, long long roundId) {
     long long key = roundId * maxNodes + nodeId;
     if (cacheHitCount + cacheMissCount == reportCacheHitAfterTimes) {
-        printf("ROUND %d, next hit rate of %d checks is: HIT %d/%d | MISS %d/%d\n",
-            roundId, reportCacheHitAfterTimes,
-            cacheHitCount, reportCacheHitAfterTimes,
-            cacheMissCount, reportCacheHitAfterTimes
-        );
+        cacheHitByRound[roundId].push_back(cacheHitCount);
         cacheHitCount = 0; cacheMissCount = 0;
     }
     it = nodesCache.find(key);
