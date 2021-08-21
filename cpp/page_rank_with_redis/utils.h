@@ -116,7 +116,7 @@ void __report() {
     cout << "\n\n ### CACHE HIT RATE:\n";
     for1(i, MAX_ROUND) {
         cout << "\n ROUND: " << i << " ";
-        for0(j, cacheHitByRound[i].size) cout << cacheHitByRound[i][j] << " ";
+        for0(j, cacheHitByRound[i].size()) cout << cacheHitByRound[i][j] << " ";
     }
 
 }
@@ -191,5 +191,5 @@ int getWorkerByIp(char* ipAddress) {
 }
 
 void printWorker(worker w) {
-    printf("\n\nWORKER %s at ROUND %lld\nSTART - END: %d - %d\n", w.ip, currentRoundId, w.startNode, w.endNode);
+    printf("\n\nWORKER %s at ROUND %lld\nSTART - END: %lld - %lld\n", w.ip, currentRoundId, w.startNode, w.endNode);
 }
