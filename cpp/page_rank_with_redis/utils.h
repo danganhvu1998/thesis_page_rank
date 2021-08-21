@@ -66,7 +66,7 @@ long long currentRoundId = 0;
 long long const maxNodes = 100000000007; // 1e11
 // TODO: Get ram size and use only 20-30% of it
 long long const maxCaches = 50000007; // 5 * 1e7
-
+int cacheHitCount = 0, cacheMissCount = 0, reportCacheHitAfterTimes = 1000; // Set to -1 to have no report
 
 
 int currentDateTime() {

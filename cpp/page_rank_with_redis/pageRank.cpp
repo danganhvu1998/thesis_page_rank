@@ -73,6 +73,7 @@ int main() {
     for0(i, N) setNodeVal(i, 1.0, 0);
     debugTime("Done INIT");
     for1(i, MAX_ROUND) {
+        cacheHitCount = 0; cacheMissCount = 0;
         currentRoundId = i;
         getTask();
         debugTime("Start round " + to_string(i));
