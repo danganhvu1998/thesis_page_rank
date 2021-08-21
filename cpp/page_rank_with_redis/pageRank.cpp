@@ -25,6 +25,9 @@ void calculation(long long round) {
         //     cout << "ROUND " << round << ": " << i << " " << j << " " << edgesTo[i][j] << " " << values[j] << endl;
         // }
         t_end = std::chrono::high_resolution_clock::now();
+        if ((i - localWorkerStartNode) % 1000 == 0) {
+            cout << i - localWorkerStartNode << " TIME " << std::chrono::duration<double, std::milli>(t_end - t_start).count() << "\n";
+        }
         readTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         free(nodesId);
         // Calculate value of node i in this round
