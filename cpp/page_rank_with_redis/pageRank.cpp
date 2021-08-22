@@ -47,5 +47,5 @@ int main() {
     char* fileName = (char*)malloc(100);
     snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
     freopen(fileName, "w", stdout);
-    for0(i, 20) cout << getNodeVal(i, MAX_ROUND - 1) << ' '; // To make sure the result is correct
+    for0(i, 1000) cout << nodeCachedValue[i] << ' '; // To make sure the result is correct
 }
