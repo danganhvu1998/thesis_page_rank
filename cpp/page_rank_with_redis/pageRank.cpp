@@ -73,7 +73,7 @@ int main() {
     }
     debugTime("Done Reading");
     // INIT WEIGHT
-    for0(i, N) setNodeVal(i, 1.0, 0);
+    for0(i, N) nodeCachedValue[i] = 1;
     debugTime("Done INIT");
     for1(i, MAX_ROUND) {
         cacheHitCount = 0; cacheMissCount = 0;
