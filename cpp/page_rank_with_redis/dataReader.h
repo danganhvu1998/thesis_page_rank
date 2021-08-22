@@ -101,7 +101,7 @@ void getAllNodesValue(long long roundId) {
         int next = workersList[i].startNode;
         for (int j = workersList[i].startNode; j < workersList[i].endNode; j++) {
             nodesId[j - next] = j;
-            if (j - next >= MAX_SIZE_BULK_GET || j == workersList[i].endNode - 1) {
+            if (j - next >= MAX_SIZE_BULK_GET || j == workersList[i].endNode - 1 || j == N) {
                 // SEND TO GET THE DATA
                 char* command = getValsCommand(nodesId, j - next + 1, roundId);
                 long long waitedCount = 0;
@@ -109,6 +109,10 @@ void getAllNodesValue(long long roundId) {
                     double* res = executeGetValsCommand(command, i);
                     bool isDone = true;
                     for (long long k = 0; k < j - next + 1; k++) {
+                        if (res[k] < 0) {
+                            isDone = false;
+                            break;
+                        }
                         nodeCachedValue[next + k] = res[k];
                     }
                     free(res);
@@ -116,9 +120,9 @@ void getAllNodesValue(long long roundId) {
                     else {
                         ++waitedCount;
                         if (debugLevel >= 1) {
-                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", workersList[i].ip, roundId, waitedCount * 2);
+                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", workersList[i].ip, roundId, waitedCount);
                         }
-                        usleep(2000000);
+                        usleep(1000000);
                     }
                 }
                 free(command);
