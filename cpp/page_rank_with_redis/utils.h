@@ -81,17 +81,6 @@ void __report() {
     cout << "\n# SIZE: NODE_COUNT: " << N << "; EDGE_COUNT: " << M << "; ROUND_COUNT: " << MAX_ROUND << "; WORKER_COUNT: " << workersCount << "; WORKER_ID: " << localWorkerId;
 
     cout << "\n\n## REPORT BY RUNNING TIME (MS)";
-    cout << "\n\n ### REDIS COMMAND:\n";
-    cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount;
-    cout << "\n  + SET CMD RUNNING TIME: " << redisGetCmdRunningTime << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount;
-
-    cout << "\n\n ### RUNNING TIME BY FUNCTIONS:\n";
-    cout << "\n  + TOTAL READ TIME: " << readTime;
-    cout << "\n    + CACHE TIME: " << cacheTime;
-    cout << "\n    + REDIS READ TIME: " << redisReadTime;
-    cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime;
-    cout << "\n  + TOTAL SET TIME: " << setTime;
-
     cout << "\n\n ### RUNNING TIME BY ROUND:\n";
     cout << "\n  + ALL ROUNDS: " << totalRoundTime << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size();
     for (int i = 0; i < runningTimesByRound.size(); i++) {
@@ -99,29 +88,11 @@ void __report() {
     }
 
     cout << "\n\n## REPORT BY PERCENTAGE RUNNING TIME";
-    cout << "\n\n ### REDIS COMMAND:\n";
-    cout << "\n  + SET CMD RUNNING TIME: " << redisSetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE SET CMD: " << redisSetCmdRunningTime / redisSetCount / totalRoundTime * 100;
-    cout << "\n  + GET CMD RUNNING TIME: " << redisGetCmdRunningTime / totalRoundTime * 100 << "\n    + AVERAGE GET CMD: " << redisGetCmdRunningTime / redisGetCount / totalRoundTime * 100;
-
-    cout << "\n\n ### RUNNING TIME BY FUNCTIONS:\n";
-    cout << "\n  + TOTAL READ TIME: " << readTime / totalRoundTime * 100;
-    cout << "\n    + CACHE TIME: " << cacheTime / totalRoundTime * 100;
-    cout << "\n    + REDIS READ TIME: " << redisReadTime / totalRoundTime * 100;
-    cout << "\n  + TOTAL CALCULATION TIME: " << calculateTime / totalRoundTime * 100;
-    cout << "\n  + TOTAL SET TIME: " << setTime / totalRoundTime * 100;;
-
     cout << "\n\n ### RUNNING TIME BY ROUND:\n";
     cout << "\n  + ALL ROUNDS: " << totalRoundTime / totalRoundTime * 100 << "\n  + AVERAGE: " << totalRoundTime / runningTimesByRound.size() / totalRoundTime * 100;
     for (int i = 0; i < runningTimesByRound.size(); i++) {
         cout << "\n     + ROUND " << i + 1 << ": " << runningTimesByRound[i] / totalRoundTime * 100;
     }
-    cout << "\n\n ### CACHE HIT RATE:\n";
-    for1(i, MAX_ROUND) {
-        cout << "\n ROUND " << i << ": [";
-        for0(j, cacheHitByRound[i].size()) cout << cacheHitByRound[i][j] << ",";
-        cout << "]\n";
-    }
-
 }
 
 void debugTime(string debugString) {

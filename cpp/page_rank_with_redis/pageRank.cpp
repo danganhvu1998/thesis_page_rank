@@ -38,14 +38,21 @@ int main() {
     for0(i, N) nodeCachedValue[i] = 1;
     debugTime("Done READING + INIT");
     for1(i, MAX_ROUND) {
+        auto r_start = std::chrono::high_resolution_clock::now();
         getTask();
         currentRoundId = i;
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
         getAllNodesValue(i);
+        auto r_end = std::chrono::high_resolution_clock::now();
+        roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
+        runningTimesByRound.push_back(roundTime);
+        totalRoundTime += roundTime;
     }
+    __report();
     char* fileName = (char*)malloc(100);
     snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
     freopen(fileName, "w", stdout);
+    __report();
     for0(i, 1000) cout << nodeCachedValue[i] << ' '; // To make sure the result is correct
 }
