@@ -65,8 +65,8 @@ double redisSetCmdRunningTime, redisGetCmdRunningTime, redisStringToDoubleConver
 long long currentRoundId = 0;
 long long const maxNodes = 100000000007; // 1e11
 // 80% for index cached, 20% for unordered_map
-const long long cacheSize = STORAGE_FOR_CACHING_IN_GB * 1024 * 1024 * 1024 / 8;
-const long long maxCaches = cacheSize / 2; // 5 * 1e7
+const long long cacheSize = STORAGE_FOR_CACHING_IN_GB * 134217728; // 1024 * 1024 * 1024 / 8;
+const long long maxCaches = cacheSize / 5;
 const long long maxIndexCachedSize = cacheSize / 5 * 4;
 double nodeCachedValue[maxIndexCachedSize];
 int cacheHitCount = 0, cacheMissCount = 0, reportCacheHitAfterTimes = 1000; // Set to -1 to have no report
