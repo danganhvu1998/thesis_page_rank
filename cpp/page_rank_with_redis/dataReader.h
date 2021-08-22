@@ -96,6 +96,7 @@ double getNodeVal(long long nodeId, long long roundId) {
 }
 
 void getAllNodesValue(long long roundId) {
+    printf("\n=======================================\n\nSTART GET INDEX CACHED VALUE\n");
     long long nodesId[MAX_SIZE_BULK_GET + 5];
     for (int i = 0; i < workersCount; i++) {
         int next = workersList[i].startNode;
@@ -130,5 +131,5 @@ void getAllNodesValue(long long roundId) {
             }
         }
     }
-    printf("\n=======================================\n\nDONE GET INDEX CACHED VALUE\n\n=======================================\n");
+    printf("\nDONE GET INDEX CACHED VALUE\n\n=======================================\n");
 }

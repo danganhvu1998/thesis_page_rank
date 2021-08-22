@@ -93,6 +93,7 @@ void __report() {
     for (int i = 0; i < runningTimesByRound.size(); i++) {
         cout << "\n     + ROUND " << i + 1 << ": " << runningTimesByRound[i] / totalRoundTime * 100;
     }
+    cout << "\n\n";
 }
 
 void debugTime(string debugString) {
