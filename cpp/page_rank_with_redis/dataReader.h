@@ -4,8 +4,8 @@
 
 #define II pair<int, int>
 
-
-
+std::unordered_map<long long, double> nodesCache;
+std::unordered_map<long long, double>::iterator it;
 
 double getValueFromCache(long long nodeId, long long roundId) {
     if (nodeId < maxIndexCachedSize) return nodeCachedValue[nodeId];
