@@ -95,7 +95,7 @@ double getNodeVal(long long nodeId, long long roundId) {
     return res;
 }
 
-void getAllNodesValue() {
+void getAllNodesValue(long long roundId) {
     long long nodesId[MAX_SIZE_BULK_GET + 5];
     for (int i = 0; i < workersCount; i++) {
         int next = workersList[i].startNode;
@@ -103,7 +103,7 @@ void getAllNodesValue() {
             nodesId[j - next] = j;
             if (j - next >= MAX_SIZE_BULK_GET || j == workersList[i].endNode - 1) {
                 // SEND TO GET THE DATA
-                char* command = getValsCommand(nodesId, j - next + 1, currentRoundId);
+                char* command = getValsCommand(nodesId, j - next + 1, roundId);
                 long long waitedCount = 0;
                 while (1) {
                     double* res = executeGetValsCommand(command, i);
@@ -116,7 +116,7 @@ void getAllNodesValue() {
                     else {
                         ++waitedCount;
                         if (debugLevel >= 1) {
-                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", workersList[i].ip, currentRoundId, waitedCount * 2);
+                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", workersList[i].ip, roundId, waitedCount * 2);
                         }
                         usleep(2000000);
                     }
@@ -126,48 +126,5 @@ void getAllNodesValue() {
             }
         }
     }
-    printf("\nDONE GET INDEX CACHED VALUE\n");
-}
-
-bool __testDataReader() {
-    bool testResult = true;
-    long long nodesCount = 7;
-    long long roundId = 9;
-    long long nodesId[] = { 1, 4, 6, 7 ,8, 20, 15 };
-    double values[] = { 1.13412341432, 4.1132413241234, 6.412341321324, 7.541323234 ,8.713241234567, 20.7456, 15.456098765437 };
-    setNodesValRedis(nodesId, values, nodesCount, roundId);
-    double* getVals = getNodesVal(nodesId, nodesCount, roundId);
-    for (int i = 0; i < nodesCount; i++) {
-        if (!isEqual(values[i], getVals[i])) testResult = false;
-    }
-    if (debugLevel >= 20) {
-        for (int i = 0; i < nodesCount; i++) {
-            printf("Set value: %lf; Get value: %lf; Is correct: %d\n", values[i], getVals[i], isEqual(values[i], getVals[i]));
-        }
-        printf("\n");
-    }
-    free(getVals);
-    getVals = getNodesVal(nodesId, nodesCount, roundId);
-    for (int i = 0; i < nodesCount; i++) {
-        if (!isEqual(values[i], getVals[i])) testResult = false;
-    }
-    if (debugLevel >= 20) {
-        for (int i = 0; i < nodesCount; i++) {
-            printf("Set value: %lf; Get value: %lf; Is correct: %d\n", values[i], getVals[i], isEqual(values[i], getVals[i]));
-        }
-        printf("\n");
-    }
-    free(getVals);
-    getVals = getNodesVal(nodesId, nodesCount, 11);
-    for (int i = 0; i < nodesCount; i++) {
-        if (!isEqual(getVals[i], -1)) testResult = false;
-    }
-    if (debugLevel >= 20) {
-        for (int i = 0; i < nodesCount; i++) {
-            printf("Set value: null; Get value: %lf; Is correct: %d\n", getVals[i], isEqual(values[i], -1));
-        }
-        printf("\n");
-    }
-    printf("__testDataReader: Test result: %s\n", testResult ? "OK" : "FAIL");
-    return testResult;
+    printf("\n=======================================\n\nDONE GET INDEX CACHED VALUE\n\n=======================================\n");
 }

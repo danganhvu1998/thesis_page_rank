@@ -46,7 +46,6 @@ vector<double> runningTimesByRound;
 vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
 long long toNodesCount[MAXIMUM_NODE_SUPPORT];
 long long N, M;
-long long lastRound = 0;
 
 // If support openMP
 long long CURRENT_THREAD = 0;

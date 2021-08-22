@@ -235,8 +235,8 @@ void getTask() {
         }
         reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
         workersCount = split(reply->str, ",", ip);
-        // cout << "workersCount: " << workersCount << endl;
-        // for0(i, workersCount) cout << "ip: " << ip[i] << endl;
+        cout << "workersCount: " << workersCount << endl;
+        for0(i, workersCount) cout << "ip: " << ip[i] << endl;
         freeReplyObject(reply);
         for (int i = 0; i < workersCount; i++) {
             int currWorkerId = getWorkerById(i);
@@ -252,7 +252,7 @@ void getTask() {
             else {
                 workersList[currWorkerId].startNode = atoi(reply->element[0]->str);
                 workersList[currWorkerId].endNode = atoi(reply->element[1]->str);
-                // printWorker(workersList[currWorkerId]);
+                printWorker(workersList[currWorkerId]);
                 if (!strcmp(LOCAL_IP_ADDRESS, workersList[currWorkerId].ip)) {
                     localWorkerStartNode = workersList[currWorkerId].startNode;
                     localWorkerEndNode = workersList[currWorkerId].endNode;
