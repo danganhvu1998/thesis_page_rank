@@ -9,6 +9,7 @@ std::unordered_map<long long, double>::iterator it;
 
 double getValueFromCache(long long nodeId, long long roundId) {
     if (nodeId < maxIndexCachedSize) return nodeCachedValue[nodeId];
+    printf("REACHED HERE %lld >= %lld", nodeId, maxIndexCachedSize);
     long long key = roundId * maxNodes + nodeId;
     if (cacheHitCount + cacheMissCount == reportCacheHitAfterTimes) {
         cacheHitByRound[roundId].push_back(cacheHitCount);
