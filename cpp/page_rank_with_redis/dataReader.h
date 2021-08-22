@@ -4,11 +4,11 @@
 
 #define II pair<int, int>
 
-std::unordered_map<long long, double> nodesCache;
-std::unordered_map<long long, double>::iterator it;
+
 
 
 double getValueFromCache(long long nodeId, long long roundId) {
+    if (nodeId < maxIndexCachedSize) return nodeCachedValue[nodeId];
     long long key = roundId * maxNodes + nodeId;
     if (cacheHitCount + cacheMissCount == reportCacheHitAfterTimes) {
         cacheHitByRound[roundId].push_back(cacheHitCount);
@@ -92,6 +92,40 @@ double getNodeVal(long long nodeId, long long roundId) {
     double res = resArray[0];
     free(resArray);
     return res;
+}
+
+void getAllNodesValue() {
+    long long nodesId[MAX_SIZE_BULK_GET + 5];
+    for (int i = 0; i < workersCount; i++) {
+        int next = workersList[i].startNode;
+        for (int j = workersList[i].startNode; j < workersList[i].endNode; j++) {
+            nodesId[j - next] = j;
+            if (j - next >= MAX_SIZE_BULK_GET || j == workersList[i].endNode - 1) {
+                // SEND TO GET THE DATA
+                char* command = getValsCommand(nodesId, j - next + 1, currentRoundId);
+                long long waitedCount = 0;
+                while (1) {
+                    double* res = executeGetValsCommand(command, i);
+                    bool isDone = true;
+                    for (long long k = 0; k < j - next + 1; k++) {
+                        nodeCachedValue[next + k] = res[k];
+                    }
+                    free(res);
+                    if (isDone) break;
+                    else {
+                        ++waitedCount;
+                        if (debugLevel >= 1) {
+                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", workersList[i].ip, currentRoundId, waitedCount * 2);
+                        }
+                        usleep(2000000);
+                    }
+                }
+                free(command);
+                next = j + 1;
+            }
+        }
+    }
+    printf("\nDONE GET INDEX CACHED VALUE\n");
 }
 
 bool __testDataReader() {

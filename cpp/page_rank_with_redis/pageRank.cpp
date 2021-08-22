@@ -26,7 +26,7 @@ void calculation(long long round) {
         // }
         t_end = std::chrono::high_resolution_clock::now();
         if ((i - localWorkerStartNode) % 10000 == 0) {
-            cout << i - localWorkerStartNode << "th -> " << std::chrono::duration<double, std::milli>(t_end - t_start).count() << " -> " << 1.0 * cacheHitCount / (cacheHitCount + cacheMissCount) << "% " << cacheHitCount << "\n";
+            cout << i - localWorkerStartNode << "th -> " << std::chrono::duration<double, std::milli>(t_end - t_start).count() << " -> " << 100.0 * cacheHitCount / (cacheHitCount + cacheMissCount) << "% " << cacheHitCount << "\n";
         }
         readTime += std::chrono::duration<double, std::milli>(t_end - t_start).count();
         free(nodesId);
@@ -90,6 +90,7 @@ int main() {
         roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
         runningTimesByRound.push_back(roundTime);
         totalRoundTime += roundTime;
+        getAllNodesValue();
         // __report();
     }
     __report();
