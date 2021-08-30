@@ -143,6 +143,7 @@ void executeSetValsCommand(char* command, redisContext* context = local, long lo
 }
 
 void setNodesValRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
+    // TODO URGENT: Maximum set 10^5 nodes val at a time
     char* command = setValsCommand(nodesId, values, nodesCount, roundId);
     executeSetValsCommand(command);
     free(command);

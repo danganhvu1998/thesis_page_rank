@@ -5,8 +5,11 @@
 
 using namespace std;
 
+vector<double> roundResult;
+
 void calculation(long long round) {
     currentRoundId = round;
+    roundResult.clear();
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) {
         double weight = 0;
         for0(j, edgesTo[i].size()) {
@@ -14,14 +17,18 @@ void calculation(long long round) {
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
-        setNodeVal(i, weight, round);
+        roundResult.push_back(weight);
     }
+    double* values = &roundResult[0];
+    long long* nodesId = new long long[roundResult.size()];
+    for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) nodesId[i - localWorkerStartNode] = i;
+    setNodesValRedis(nodesId, values, roundResult.size(), round);
 }
 
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/soc-LiveJournal1.out", "r", stdin);
+    freopen("data/graph_1000.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
