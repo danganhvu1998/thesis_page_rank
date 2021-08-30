@@ -144,7 +144,19 @@ void executeSetValsCommand(char* command, redisContext* context = local, long lo
 
 void setNodesValRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
     // TODO URGENT: Maximum set 10^5 nodes val at a time
-    char* command = setValsCommand(nodesId, values, nodesCount, roundId);
+    const int bulkSize = 100000;
+    for (int i = bulkSize; i < nodesCount; i += bulkSize) {
+        char* command = setValsCommand(&nodesId[i - bulkSize], &values[i - bulkSize], bulkSize, roundId);
+        executeSetValsCommand(command);
+        free(command);
+        cout << "DONE " << i << " / " << nodesCount << "\n";
+    }
+    char* command = setValsCommand(
+        &nodesId[nodesCount - nodesCount % bulkSize],
+        &values[nodesCount - nodesCount % bulkSize],
+        nodesCount % bulkSize,
+        roundId
+    );
     executeSetValsCommand(command);
     free(command);
 }
