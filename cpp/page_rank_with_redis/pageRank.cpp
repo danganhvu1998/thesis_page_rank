@@ -31,7 +31,7 @@ void calculation(long long round) {
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/soc-LiveJournal1.out", "r", stdin);
+    freopen("data/graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
@@ -53,11 +53,14 @@ int main() {
         currentRoundId = i;
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
+        auto cal_end = std::chrono::high_resolution_clock::now();
         getAllNodesValue(i);
         auto r_end = std::chrono::high_resolution_clock::now();
         roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
         runningTimesByRound.push_back(roundTime);
         totalRoundTime += roundTime;
+        calculateTime += std::chrono::duration<double, std::milli>(cal_end - r_start).count();
+        prepareTime += std::chrono::duration<double, std::milli>(r_end - cal_end).count();
     }
     __report();
     char* fileName = (char*)malloc(100);

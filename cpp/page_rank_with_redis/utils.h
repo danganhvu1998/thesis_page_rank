@@ -79,6 +79,9 @@ int currentDateTime() {
 void __report() {
 
     cout << "\n# SIZE: NODE_COUNT: " << N << "; EDGE_COUNT: " << M << "; ROUND_COUNT: " << MAX_ROUND << "; WORKER_COUNT: " << workersCount << "; WORKER_ID: " << localWorkerId;
+    cout << "\n TOTAL TIME: " << totalRoundTime;
+    cout << "\n CALCULATION TIME: " << calculateTime;
+    cout << "\n PREPARE TIME: " << prepareTime;
 
     cout << "\n\n## REPORT BY RUNNING TIME (MS)";
     cout << "\n\n ### RUNNING TIME BY ROUND:\n";
