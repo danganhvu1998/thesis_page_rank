@@ -36,14 +36,15 @@ int main() {
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
     for0(i, N) toNodesCount[i] = 0;
+    getTask();
     for0(i, M) {
         long long a, b;
         cin >> a >> b; // From a we can go to b
         ++toNodesCount[a];
-        // if (b >= localWorkerStartNode && b < localWorkerEndNode) {
-        //     cout << b << " " << a << endl;
-        // }
-        edgesTo[b].push_back(a);
+        if (b >= localWorkerStartNode && b < localWorkerEndNode) {
+            cout << b << " " << a << endl;
+        }
+        // edgesTo[b].push_back(a);
     }
     for0(i, N) nodeCachedValue[i] = 1;
     debugTime("Done READING + INIT");
