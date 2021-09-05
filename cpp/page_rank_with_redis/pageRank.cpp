@@ -42,9 +42,9 @@ int main() {
         cin >> a >> b; // From a we can go to b
         ++toNodesCount[a];
         if (b >= localWorkerStartNode && b < localWorkerEndNode) {
-            cout << b << " " << a << endl;
+            // cout << b << " " << a << endl;
+            edgesTo[b].push_back(a);
         }
-        // edgesTo[b].push_back(a);
     }
     for0(i, N) nodeCachedValue[i] = 1;
     debugTime("Done READING + INIT");
