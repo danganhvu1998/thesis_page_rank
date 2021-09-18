@@ -42,7 +42,7 @@ redisContext* workersContext[MAX_WORKERS][MAX_THREADS];
 worker workersList[MAX_WORKERS];
 
 // VARIABLES
-vector<double> runningTimesByRound;
+vector<double> runningTimesByRound, calculationTimesByRound, gettingDataTimesByRound;
 vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
 long long toNodesCount[MAXIMUM_NODE_SUPPORT];
 long long N, M;
@@ -57,7 +57,7 @@ long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
 
 // For checking running status
-double readTime, calculateTime, prepareTime, totalRoundTime, roundTime, setTime, cacheTime, redisReadTime;
+double readTime, calculateTime, prepareTime, totalRoundTime, roundTime, roundCalTime = -1, roundGetNodeTime = -1, setTime, cacheTime, redisReadTime;
 double redisSetCmdRunningTime, redisGetCmdRunningTime, redisStringToDoubleConvertTime;
 
 // 

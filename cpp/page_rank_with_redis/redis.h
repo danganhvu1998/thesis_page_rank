@@ -236,6 +236,10 @@ void distributeTask() {
 }
 
 void getTask() {
+    // Announce BE about last result if have.
+    if (roundCalTime > 0 and roundGetNodeTime > 0) {
+        redisCommand(mainWorkerRedis, "MSET DISTRIBUTED_TASK_FOR_ROUND_%lld", currentRoundId);
+    }
     if (!strcmp(LOCAL_IP_ADDRESS, MAIN_WORKER_IP_ADDRESS)) {
         distributeTask();
     }

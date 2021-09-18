@@ -59,10 +59,14 @@ int main() {
         getAllNodesValue(i);
         auto r_end = std::chrono::high_resolution_clock::now();
         roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
+        roundGetNodeTime = std::chrono::duration<double, std::milli>(r_end - cal_end).count();
+        roundCalTime = std::chrono::duration<double, std::milli>(cal_end - r_start).count();
         runningTimesByRound.push_back(roundTime);
+        calculationTimesByRound.push_back(roundCalTime);
+        gettingDataTimesByRound.push_back(roundGetNodeTime);
         totalRoundTime += roundTime;
-        calculateTime += std::chrono::duration<double, std::milli>(cal_end - r_start).count();
-        prepareTime += std::chrono::duration<double, std::milli>(r_end - cal_end).count();
+        calculateTime += roundCalTime;
+        prepareTime += roundGetNodeTime;
     }
     __report();
     char* fileName = (char*)malloc(100);
