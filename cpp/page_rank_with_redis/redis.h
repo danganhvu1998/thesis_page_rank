@@ -217,8 +217,8 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
 void distributeTask() {
     redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
     workersCount = split(reply->str, ",", ip);
-    // cout << "\nworkersCount: " << workersCount << endl;
-    // for0(i, workersCount) cout << "ip: " << ip[i] << endl;
+    cout << "\nworkersCount: " << workersCount << endl;
+    for0(i, workersCount) cout << "ip: " << ip[i] << endl;
     freeReplyObject(reply);
     int startNode = 0, endNode = 0;
     double totalGetTimeByGetNode = 0;
@@ -243,19 +243,19 @@ void distributeTask() {
             reply = (redisReply*)redisCommand(workersList[currWorkerId].redis, "MGET %s_AT_ROUND %s_CALCULATE_TIME_LAST_ROUND %s_GET_DATA_TIME_LAST_ROUND",
                 workersList[currWorkerId].ip, workersList[currWorkerId].ip, workersList[currWorkerId].ip
             );
-            // printRedisReply(reply, "Check running time");
-            if(reply->element[0] ) workerCurrRound = atoi(reply->element[0]->str);
-            printf("\nip: %s, workerCurrRound: %lld, currentRoundId: %lld\n", workersList[currWorkerId].ip, workerCurrRound, currentRoundId);
+            printRedisReply(reply, "Check running time");
+            if(reply->element[0]->str ) workerCurrRound = atoi(reply->element[0]->str);
+            printf("\nip: %s, workerCurrRound: %lld - %s, currentRoundId: %lld\n", workersList[currWorkerId].ip, workerCurrRound, reply->element[0]->str, currentRoundId);
             if(workerCurrRound == 0 || workerCurrRound == currentRoundId){
                 workersList[currWorkerId].lastRoundCalTime = atof(reply->element[1]->str);
                 workersList[currWorkerId].lastRoundGetDataTime = atof(reply->element[2]->str);
                 totalGetTimeByGetNode += workersList[currWorkerId].lastRoundGetDataTime / (workersList[currWorkerId].endNode - workersList[currWorkerId].startNode);
+                printWorker(workersList[currWorkerId]);
+                freeReplyObject(reply);
             } else {
                 i--; // Check again
                 usleep(500000);
             }
-            printWorker(workersList[currWorkerId]);
-            freeReplyObject(reply);
         }
         // Re-distribute task
         for (int i = 0; i < workersCount; i++) {
@@ -276,7 +276,6 @@ void distributeTask() {
 }
 
 void getTask() {
-    printf("GETTING TASK %lf %lf", roundCalTime, roundGetNodeTime);
     // Announce BE about last result if have.
     if (roundCalTime > 0 and roundGetNodeTime > 0) {
         char* command = (char*)malloc(500);
@@ -285,6 +284,7 @@ void getTask() {
             LOCAL_IP_ADDRESS, roundCalTime,
             LOCAL_IP_ADDRESS, roundGetNodeTime
         );
+        printf("COMMAND", command);
         redisCommand(mainWorkerRedis, command);
         free(command);
     }
