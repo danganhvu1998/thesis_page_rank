@@ -17,7 +17,7 @@ typedef struct _worker {
     char* ip;
     redisContext* redis;
     double clockRate, ram, coresCount, lastRoundCalTime, lastRoundGetDataTime;
-    long long startNode, endNode;
+    long long startNode, endNode, loadStartNode, loadEndNode;
 } worker;
 
 // SETTING PARAMS
@@ -169,20 +169,21 @@ int getWorkerByIp(char* ipAddress) {
 }
 
 void printWorker(worker w) {
-    printf("\nWORKER %s at ROUND %lld\nSTART - END: %lld - %lld\nTIME: cal:%ld - get:%lf\n\n",
+    printf("\nWORKER %s at ROUND %lld\nSTART - END: %lld - %lld\nLOAD START - END: %lld - %lld\nTIME: cal:%ld - get:%lf\n\n",
         w.ip, currentRoundId,
         w.startNode, w.endNode,
+        w.loadStartNode, w.loadEndNode,
         w.lastRoundCalTime, w.lastRoundGetDataTime
     );
 }
 
-II getLoadRange(long long startNode, long long endNode, long long minNode= 1, long long maxNode = N){
-    long long loadStartNode = startNode, loadEndNode = endNode, totalLoadNodes = (endNode-startNode)*2;
+II getLoadRange(long long startNode, long long endNode, long long minNode= 0, long long maxNode = N-1){
+    long long loadStartNode = startNode, loadEndNode = endNode, totalLoadNodes = (endNode-startNode)*3/2;
     if(loadStartNode == minNode) { loadEndNode = loadStartNode+totalLoadNodes;}
     else if(loadEndNode == maxNode) { loadStartNode = loadEndNode-totalLoadNodes;}
     else{
-        loadStartNode = startNode - (endNode-startNode)/2;
-        loadEndNode = endNode + (endNode-startNode)/2;
+        loadStartNode = startNode - (totalLoadNodes-endNode+startNode)/2;
+        loadEndNode = endNode + (totalLoadNodes-endNode+startNode)/2;
     }
     loadStartNode = max(loadStartNode, minNode);
     loadEndNode = min(loadEndNode, maxNode);

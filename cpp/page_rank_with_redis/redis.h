@@ -313,8 +313,14 @@ void getTask() {
                 usleep(500000);
             }
             else {
-                workersList[currWorkerId].startNode = atoi(reply->element[0]->str);
+                workersList[currWorkerId].startNode = max(0, atoi(reply->element[0]->str));
                 workersList[currWorkerId].endNode = atoi(reply->element[1]->str);
+                if(workersList[currWorkerId].endNode >= N) workersList[currWorkerId].endNode = N-1;
+                if(currentRoundId == 0){
+                    II loadData = getLoadRange(workersList[currWorkerId].startNode, workersList[currWorkerId].endNode, 0, N-1);
+                    workersList[currWorkerId].loadStartNode = loadData.first;
+                    workersList[currWorkerId].loadEndNode = loadData.second;
+                }
                 printWorker(workersList[currWorkerId]);
                 if (!strcmp(LOCAL_IP_ADDRESS, workersList[currWorkerId].ip)) {
                     localWorkerStartNode = workersList[currWorkerId].startNode;

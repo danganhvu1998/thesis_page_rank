@@ -36,7 +36,7 @@ int main() {
     cin >> N >> M;
     getTask();
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
-    II loadNodeData = getLoadRange(localWorkerStartNode, localWorkerEndNode, 1, N);
+    II loadNodeData = getLoadRange(localWorkerStartNode, localWorkerEndNode, 0, N-1);
     localLoadStartNode = loadNodeData.first;
     localLoadEndNode = loadNodeData.second;
     printf("localLoadStartNode: %lld - localLoadEndNode: %lld\n", localLoadStartNode, localLoadEndNode);
