@@ -288,9 +288,11 @@ void getTask() {
         redisCommand(mainWorkerRedis, command);
         free(command);
     }
+    printf("\n***** DONE SEND LAST ROUND DATA *****\n");
     if (!strcmp(LOCAL_IP_ADDRESS, MAIN_WORKER_IP_ADDRESS)) {
         distributeTask();
     }
+    printf("\n***** DONE DISTRIBUTE ROUND TASK *****\n");
     while (1) {
         redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET DISTRIBUTED_TASK_FOR_ROUND_%lld", currentRoundId);
         if (reply->str == NULL) {
@@ -335,6 +337,7 @@ void getTask() {
         }
         break;
     }
+    printf("\n***** DONE GET ROUND TASK *****\n");
 }
 
 void getRunningEnv() {
