@@ -220,7 +220,7 @@ void distributeTask() {
     cout << "\nworkersCount: " << workersCount << endl;
     for0(i, workersCount) cout << "ip: " << ip[i] << endl;
     freeReplyObject(reply);
-    int startNode = 0, endNode = 0;
+    long long startNode = 0, endNode = 0;
     double totalGetTimeByGetNode = 0;
     if(currentRoundId <=1){
         // First round, every node is equal
@@ -267,13 +267,14 @@ void distributeTask() {
             int currWorkerId = getWorkerById(i);
             double currWorkerGetNodeTimeRate = workersList[currWorkerId].lastRoundGetDataTime / (workersList[currWorkerId].endNode - workersList[currWorkerId].startNode);
             endNode = min((long long)(startNode + N * currWorkerGetNodeTimeRate / totalGetTimeByGetNode+10), workersList[currWorkerId].loadEndNode);
+            if(currWorkerId+1<workersCount) endNode = max(endNode, workersList[currWorkerId+1].loadStartNode);
             totalGetTimeByGetNode -= currWorkerGetNodeTimeRate;
             (redisReply*)redisCommand(
                 workersList[currWorkerId].redis, "MSET ROUND_%lld_START_NODE %lld ROUND_%lld_END_NODE %lld",
                 currentRoundId, startNode,
                 currentRoundId, endNode
             );
-            printf("\nIP %d: %s: %d %d", i, workersList[currWorkerId].ip, startNode, endNode);
+            printf("\nIP %d: %s: %d %d", currWorkerId, workersList[currWorkerId].ip, startNode, endNode);
         }
     }
     (redisReply*)redisCommand(mainWorkerRedis, "SET DISTRIBUTED_TASK_FOR_ROUND_%lld %lld", currentRoundId, 1);
@@ -329,7 +330,7 @@ void getTask() {
                     workersList[currWorkerId].loadStartNode = loadData.first;
                     workersList[currWorkerId].loadEndNode = loadData.second;
                 }
-                printWorker(workersList[currWorkerId]);
+                // printWorker(workersList[currWorkerId]);
                 if (!strcmp(LOCAL_IP_ADDRESS, workersList[currWorkerId].ip)) {
                     localWorkerStartNode = workersList[currWorkerId].startNode;
                     localWorkerEndNode = workersList[currWorkerId].endNode;
