@@ -31,17 +31,21 @@ void calculation(long long round) {
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/graph_10e5.out", "r", stdin);
+    freopen("data/graph_1000.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
-    localWorkerEndNode = min(localWorkerEndNode, N + 1);
-    for0(i, N+4) toNodesCount[i] = 0;
     getTask();
+    localWorkerEndNode = min(localWorkerEndNode, N + 1);
+    II loadNodeData = getLoadRange(localWorkerStartNode, localWorkerEndNode, 1, N);
+    localLoadStartNode = loadNodeData.first;
+    localLoadEndNode = loadNodeData.second;
+    printf("localLoadStartNode: %lld - localLoadEndNode: %lld\n", localLoadStartNode, localLoadEndNode);
+    for0(i, N+4) toNodesCount[i] = 0;
     for0(i, M) {
         long long a, b;
         cin >> a >> b; // From a we can go to b
         ++toNodesCount[a];
-        if (b >= localWorkerStartNode && b < localWorkerEndNode) {
+        if (b >= localLoadStartNode && b < localWorkerEndNode) {
             // cout << b << " " << a << endl;
             edgesTo[b].push_back(a);
         }

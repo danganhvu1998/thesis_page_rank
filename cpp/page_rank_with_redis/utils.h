@@ -51,7 +51,7 @@ long long N, M;
 long long CURRENT_THREAD = 0;
 
 // Local setting
-long long localWorkerStartNode, localWorkerEndNode;
+long long localWorkerStartNode, localWorkerEndNode, localLoadStartNode, localLoadEndNode;
 long long localWorkerId = 0;
 long long redisGetCount = 0, redisSetCount = 0, redisCommandCount = 0;
 long long debugLevel = 100;
@@ -105,8 +105,8 @@ void debugTime(string debugString) {
     cout << "At " << ctime(&humanTime) << "    " << debugString << "\n";
 }
 
-void debugRedisReply(redisReply* reply, char* command = "") {
-    if (debugLevel >= 10) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %ld;", command, reply, reply->elements);
+void debugRedisReply(redisReply* reply, char* command = "", int debugLevelMinimum = 10) {
+    if (debugLevel >= debugLevelMinimum) printf("debugRedisReply->redisReply's CMD: '%s'; REPLY: %p %ld;", command, reply, reply->elements);
 }
 
 void printRedisReply(redisReply* reply, char* startStr = "") {
@@ -169,5 +169,22 @@ int getWorkerByIp(char* ipAddress) {
 }
 
 void printWorker(worker w) {
-    printf("\nWORKER %s at ROUND %lld\nSTART - END: %lld - %lld\n", w.ip, currentRoundId, w.startNode, w.endNode);
+    printf("\nWORKER %s at ROUND %lld\nSTART - END: %lld - %lld\nTIME: cal:%ld - get:%lf\n\n",
+        w.ip, currentRoundId,
+        w.startNode, w.endNode,
+        w.lastRoundCalTime, w.lastRoundGetDataTime
+    );
+}
+
+II getLoadRange(long long startNode, long long endNode, long long minNode= 1, long long maxNode = N){
+    long long loadStartNode = startNode, loadEndNode = endNode, totalLoadNodes = (endNode-startNode)*2;
+    if(loadStartNode == minNode) { loadEndNode = loadStartNode+totalLoadNodes;}
+    else if(loadEndNode == maxNode) { loadStartNode = loadEndNode-totalLoadNodes;}
+    else{
+        loadStartNode = startNode - (endNode-startNode)/2;
+        loadEndNode = endNode + (endNode-startNode)/2;
+    }
+    loadStartNode = max(loadStartNode, minNode);
+    loadEndNode = min(loadEndNode, maxNode);
+    return II(loadStartNode, loadEndNode);
 }
