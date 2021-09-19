@@ -240,9 +240,13 @@ void distributeTask() {
         for (int i = 0; i < workersCount; i++) {
             int workerCurrRound = -1;
             int currWorkerId = getWorkerById(i);
-            reply = (redisReply*)redisCommand(workersList[currWorkerId].redis, "MGET %s_AT_ROUND %s_CALCULATE_TIME_LAST_ROUND %s_GET_DATA_TIME_LAST_ROUND",
+            char* command = (char*)malloc(500);
+            sprintf(command, "MGET %s_AT_ROUND %s_CALCULATE_TIME_LAST_ROUND %s_GET_DATA_TIME_LAST_ROUND",
                 workersList[currWorkerId].ip, workersList[currWorkerId].ip, workersList[currWorkerId].ip
             );
+            printf("COMMAND %s", command);
+            reply = (redisReply*)redisCommand(mainWorkerRedis, command);
+            free(command);
             printRedisReply(reply, "Check running time");
             if(reply->element[0]->str ) workerCurrRound = atoi(reply->element[0]->str);
             printf("\nip: %s, workerCurrRound: %lld - %s, currentRoundId: %lld\n", workersList[currWorkerId].ip, workerCurrRound, reply->element[0]->str, currentRoundId);
