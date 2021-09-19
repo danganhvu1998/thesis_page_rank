@@ -16,7 +16,7 @@ using namespace std;
 typedef struct _worker {
     char* ip;
     redisContext* redis;
-    double clockRate, ram, coresCount, lastRoundRunningTime;
+    double clockRate, ram, coresCount, lastRoundCalTime, lastRoundGetDataTime;
     long long startNode, endNode;
 } worker;
 

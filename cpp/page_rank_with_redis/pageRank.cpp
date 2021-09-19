@@ -51,8 +51,8 @@ int main() {
     debugTime("Done READING + INIT");
     for1(i, MAX_ROUND) {
         auto r_start = std::chrono::high_resolution_clock::now();
-        getTask();
         currentRoundId = i;
+        getTask();
         if (i >= 3) delAllNodesAtRound(i - 3);
         calculation(i);
         auto cal_end = std::chrono::high_resolution_clock::now();
