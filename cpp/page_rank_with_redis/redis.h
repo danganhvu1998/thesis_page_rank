@@ -247,7 +247,7 @@ void distributeTask() {
             printf("COMMAND %s", command);
             reply = (redisReply*)redisCommand(mainWorkerRedis, command);
             free(command);
-            printRedisReply(reply, "Check running time");
+            // printRedisReply(reply, "Check running time");
             if(reply->element[0]->str ) workerCurrRound = atoi(reply->element[0]->str);
             printf("\nip: %s, workerCurrRound: %lld - %s, currentRoundId: %lld\n", workersList[currWorkerId].ip, workerCurrRound, reply->element[0]->str, currentRoundId);
             if(workerCurrRound == 0 || workerCurrRound == currentRoundId){
@@ -334,8 +334,8 @@ void getTask() {
                     localWorkerStartNode = workersList[currWorkerId].startNode;
                     localWorkerEndNode = workersList[currWorkerId].endNode;
                     localWorkerId = i;
-                    cout << "LOCAL WORKER:";
-                    printWorker(workersList[i]);
+                    // cout << "LOCAL WORKER:";
+                    // printWorker(workersList[i]);
                 }
             }
         }
