@@ -242,9 +242,9 @@ void distributeTask() {
             reply = (redisReply*)redisCommand(workersList[currWorkerId].redis, "MGET %s_AT_ROUND %s_CALCULATE_TIME_LAST_ROUND %s_GET_DATA_TIME_LAST_ROUND",
                 workersList[currWorkerId].ip, workersList[currWorkerId].ip, workersList[currWorkerId].ip
             );
-            printRedisReply(reply, "Check running time");
+            // printRedisReply(reply, "Check running time");
             if(reply->element[0] ) workerCurrRound = atoi(reply->element[0]->str);
-            printf("workerCurrRound: %lld, currentRoundId: %lld\n", workerCurrRound, currentRoundId);
+            printf("\nip: %s, workerCurrRound: %lld, currentRoundId: %lld\n", workersList[currWorkerId].ip, workerCurrRound, currentRoundId);
             if(workerCurrRound == 0 || workerCurrRound == currentRoundId){
                 workersList[currWorkerId].lastRoundCalTime = atof(reply->element[1]->str);
                 workersList[currWorkerId].lastRoundGetDataTime = atof(reply->element[2]->str);
@@ -252,7 +252,7 @@ void distributeTask() {
                 i--; // Check again
                 usleep(500000);
             }
-            printWorker(workersList[currWorkerId]);
+            // printWorker(workersList[currWorkerId]);
             freeReplyObject(reply);
         }
         // Get all calculation time and get data time
