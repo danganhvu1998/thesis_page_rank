@@ -217,8 +217,8 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
 void distributeTask() {
     redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
     workersCount = split(reply->str, ",", ip);
-    // cout << "workersCount: " << workersCount << endl;
-    // for0(i, workersCount) cout << "ip: " << ip[i] << endl;
+    cout << "workersCount: " << workersCount << endl;
+    for0(i, workersCount) cout << "ip: " << ip[i] << endl;
     freeReplyObject(reply);
     int startNode = 0, endNode = 0;
     if(currentRoundId <=1){
@@ -232,7 +232,7 @@ void distributeTask() {
                 currentRoundId, startNode,
                 currentRoundId, endNode
             );
-            // printf("\nIP %d: %s: %d %d", i, currWorker.ip, startNode, endNode);
+            printf("\nIP %d: %s: %d %d", i, workersList[currWorkerId].ip, startNode, endNode);
         }
     } else {
         // Check if all workers have finished last round, or this worker is new
@@ -262,6 +262,7 @@ void distributeTask() {
 }
 
 void getTask() {
+    printf("GETTING TASK %lf %lf", roundCalTime, roundGetNodeTime);
     // Announce BE about last result if have.
     if (roundCalTime > 0 and roundGetNodeTime > 0) {
         redisCommand(mainWorkerRedis, "MSET %s_AT_ROUND %lld %s_CALCULATE_TIME_LAST_ROUND %lf %s_GET_DATA_TIME_LAST_ROUND %lf",

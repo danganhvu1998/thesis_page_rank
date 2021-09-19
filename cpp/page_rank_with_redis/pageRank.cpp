@@ -31,11 +31,11 @@ void calculation(long long round) {
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/graph_10e6.out", "r", stdin);
+    freopen("data/graph_10e5.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
-    for0(i, N) toNodesCount[i] = 0;
+    for0(i, N+4) toNodesCount[i] = 0;
     getTask();
     for0(i, M) {
         long long a, b;
