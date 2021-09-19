@@ -221,6 +221,7 @@ void distributeTask() {
     // for0(i, workersCount) cout << "ip: " << ip[i] << endl;
     freeReplyObject(reply);
     int startNode = 0, endNode = 0;
+    double totalGetTimeByGetNode = 0;
     if(currentRoundId <=1){
         // First round, every node is equal
         for (int i = 0; i < workersCount; i++) {
@@ -248,20 +249,21 @@ void distributeTask() {
             if(workerCurrRound == 0 || workerCurrRound == currentRoundId){
                 workersList[currWorkerId].lastRoundCalTime = atof(reply->element[1]->str);
                 workersList[currWorkerId].lastRoundGetDataTime = atof(reply->element[2]->str);
+                totalGetTimeByGetNode += workersList[currWorkerId].lastRoundGetDataTime / (workersList[currWorkerId].endNode - workersList[currWorkerId].startNode);
             } else {
                 i--; // Check again
                 usleep(500000);
             }
-            // printWorker(workersList[currWorkerId]);
+            printWorker(workersList[currWorkerId]);
             freeReplyObject(reply);
         }
-        // Get all calculation time and get data time
-        
         // Re-distribute task
         for (int i = 0; i < workersCount; i++) {
             startNode = endNode;
-            endNode = startNode + N / workersCount + 10;
             int currWorkerId = getWorkerById(i);
+            double currWorkerGetNodeTimeRate = workersList[currWorkerId].lastRoundGetDataTime / (workersList[currWorkerId].endNode - workersList[currWorkerId].startNode);
+            endNode = min((long long)(startNode + N * currWorkerGetNodeTimeRate / totalGetTimeByGetNode+10), workersList[currWorkerId].loadEndNode);
+            totalGetTimeByGetNode -= currWorkerGetNodeTimeRate;
             (redisReply*)redisCommand(
                 workersList[currWorkerId].redis, "MSET ROUND_%lld_START_NODE %lld ROUND_%lld_END_NODE %lld",
                 currentRoundId, startNode,
