@@ -15,6 +15,7 @@ void calculation(long long round) {
         for0(j, edgesTo[i].size()) {
             const int fromNode = edgesTo[i][j];
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
+            if( fromNode%200==0 && nodeCachedValue[fromNode]<=0 ) cout<<"WEIRD "<<fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
         roundResult.push_back(weight);

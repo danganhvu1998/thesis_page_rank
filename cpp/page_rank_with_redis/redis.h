@@ -254,7 +254,7 @@ void distributeTask() {
                 workersList[currWorkerId].lastRoundCalTime = atof(reply->element[1]->str);
                 workersList[currWorkerId].lastRoundGetDataTime = atof(reply->element[2]->str);
                 totalGetTimeByGetNode += workersList[currWorkerId].lastRoundGetDataTime / (workersList[currWorkerId].endNode - workersList[currWorkerId].startNode);
-                printWorker(workersList[currWorkerId]);
+                // printWorker(workersList[currWorkerId]);
                 freeReplyObject(reply);
             } else {
                 i--; // Check again
