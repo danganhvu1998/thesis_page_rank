@@ -217,8 +217,8 @@ double* getNodesValRedis(long long* nodesId, long long nodesCount, long long rou
 void distributeTask() {
     redisReply* reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
     workersCount = split(reply->str, ",", ip);
-    cout << "\nworkersCount: " << workersCount << endl;
-    for0(i, workersCount) cout << "ip: " << ip[i] << endl;
+    // cout << "\nworkersCount: " << workersCount << endl;
+    // for0(i, workersCount) cout << "ip: " << ip[i] << endl;
     freeReplyObject(reply);
     long long startNode = 0, endNode = 0;
     double totalGetTimeByGetNode = 0;
@@ -244,12 +244,12 @@ void distributeTask() {
             sprintf(command, "MGET %s_AT_ROUND %s_CALCULATE_TIME_LAST_ROUND %s_GET_DATA_TIME_LAST_ROUND",
                 workersList[currWorkerId].ip, workersList[currWorkerId].ip, workersList[currWorkerId].ip
             );
-            printf("COMMAND %s", command);
+            // printf("COMMAND %s", command);
             reply = (redisReply*)redisCommand(mainWorkerRedis, command);
             free(command);
             // printRedisReply(reply, "Check running time");
             if(reply->element[0]->str ) workerCurrRound = atoi(reply->element[0]->str);
-            printf("\nip: %s, workerCurrRound: %lld - %s, currentRoundId: %lld\n", workersList[currWorkerId].ip, workerCurrRound, reply->element[0]->str, currentRoundId);
+            // printf("\nip: %s, workerCurrRound: %lld - %s, currentRoundId: %lld\n", workersList[currWorkerId].ip, workerCurrRound, reply->element[0]->str, currentRoundId);
             if(workerCurrRound == 0 || workerCurrRound == currentRoundId){
                 workersList[currWorkerId].lastRoundCalTime = atof(reply->element[1]->str);
                 workersList[currWorkerId].lastRoundGetDataTime = atof(reply->element[2]->str);
@@ -274,7 +274,7 @@ void distributeTask() {
                 currentRoundId, startNode,
                 currentRoundId, endNode
             );
-            printf("\nIP %d: %s: %d %d", currWorkerId, workersList[currWorkerId].ip, startNode, endNode);
+            printf("\nID: %d; IP: %s; Task: %d - %d; Last Get Time: %lf", currWorkerId, workersList[currWorkerId].ip, startNode, endNode, workersList[currWorkerId].lastRoundGetDataTime);
         }
     }
     (redisReply*)redisCommand(mainWorkerRedis, "SET DISTRIBUTED_TASK_FOR_ROUND_%lld %lld", currentRoundId, 1);
@@ -289,7 +289,7 @@ void getTask() {
             LOCAL_IP_ADDRESS, roundCalTime,
             LOCAL_IP_ADDRESS, roundGetNodeTime
         );
-        printf("COMMAND %s", command);
+        // printf("COMMAND %s", command);
         redisCommand(mainWorkerRedis, command);
         free(command);
     }
@@ -307,7 +307,6 @@ void getTask() {
         }
         reply = (redisReply*)redisCommand(mainWorkerRedis, "GET WORKERS_IP_ADDRESSES");
         workersCount = split(reply->str, ",", ip);
-        cout << "workersCount: " << workersCount << endl;
         for0(i, workersCount) cout << "ip: " << ip[i] << endl;
         freeReplyObject(reply);
         for (int i = 0; i < workersCount; i++) {
