@@ -15,7 +15,6 @@ void calculation(long long round) {
         for0(j, edgesTo[i].size()) {
             const int fromNode = edgesTo[i][j];
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
-            if( fromNode%200==0 && nodeCachedValue[fromNode]<=0 ) cout<<"WEIRD "<<fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
         roundResult.push_back(weight);
@@ -63,6 +62,10 @@ int main() {
         auto cal_end = std::chrono::high_resolution_clock::now();
         getAllNodesValue(i);
         auto r_end = std::chrono::high_resolution_clock::now();
+        for0(i, 1000) {
+            if(nodeCachedValue[i]<=0) cout<<i<<" ";
+        }
+        cout<<endl;
         roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
         roundGetNodeTime = std::chrono::duration<double, std::milli>(r_end - cal_end).count();
         roundCalTime = std::chrono::duration<double, std::milli>(cal_end - r_start).count();
