@@ -284,7 +284,7 @@ void getTask() {
             LOCAL_IP_ADDRESS, roundCalTime,
             LOCAL_IP_ADDRESS, roundGetNodeTime
         );
-        printf("COMMAND", command);
+        printf("COMMAND %s", command);
         redisCommand(mainWorkerRedis, command);
         free(command);
     }
