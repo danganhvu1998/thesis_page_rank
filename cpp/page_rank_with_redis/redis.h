@@ -227,6 +227,8 @@ void distributeTask() {
         for (int i = 0; i < workersCount; i++) {
             startNode = endNode;
             endNode = startNode + N / workersCount + 10;
+            // if(i==0) endNode = N * 35 / 100;
+            // else endNode = N;
             int currWorkerId = getWorkerById(i);
             (redisReply*)redisCommand(
                 workersList[currWorkerId].redis, "MSET ROUND_%lld_START_NODE %lld ROUND_%lld_END_NODE %lld",
