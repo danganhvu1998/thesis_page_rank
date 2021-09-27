@@ -107,6 +107,6 @@ THESIS - Page Rank on Heterogeneous Clusters
 
 # NOTE
 
-Writing Style: https://www.cs.columbia.edu/~hgs/etc/writing-style.html
-How to write a paper: https://onlinelibrary.wiley.com/doi/epdf/10.1002/adma.200400767
-How to read a paper: [link](../paper/HowtoReadPaper.pdf)
++ Writing Style: https://www.cs.columbia.edu/~hgs/etc/writing-style.html
++ How to write a paper: https://onlinelibrary.wiley.com/doi/epdf/10.1002/adma.200400767
++ How to read a paper: [link](../paper/HowtoReadPaper.pdf)
