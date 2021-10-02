@@ -9,6 +9,9 @@ THESIS - Page Rank on Heterogeneous Clusters
 + In this paper, we propose several approach to reduce the communication data via the network, and by that, spead up the process as a whole. By applying this method on PageRank, 
 + TODO: Add comparation between the application with Spark on Page Rank with the same data set.
 
+In recent years, it is not hard to notice that with the development of big data, we have actively accumulate a large amount of data. As a result, number of data set, the size of the data set, and also the need to extract important insides from them have been increased significantly.Many of them are graph related: friends connections, website links, etc. [Google first pagerank machine]. As the size of the data set increased dramatically, it is almost imporsible for any single machine to handle a big data set with a reasonable amount of times, and most if not even for processing, but to load the data in and out of the ram.
+One way to solve this problem is to use multiple machines, each will load only part of the data set and in constance communication. However, this method also have its downsize size that is communicate via the network is slow, and thus the application will spend most of the time on exchaing data instead of processing it. So reduce the communication is the key to speed up processing graph data on heterogeneous clusters.
+In this paper, we propose 2 methods to redude the network communication, and thus lead to better perfromance.
 
 # Introduction
 
@@ -35,7 +38,7 @@ THESIS - Page Rank on Heterogeneous Clusters
    2. Greatly depend on the algorithm ( ratio of computing time / communicating time )
    3. Preload extra data
       1. Good: reduce data has to be sent significantly
-      2. Bad: Can only regulate to the better state, cannot go to optimal point if the task distributed too unbalance at first.
+      2. Bad: Can - regulate to the better state, cannot go to optimal point if the task distributed too unbalance at first.
 
 # The Application: <!-- Explain the process flow in detail, with example -->
 
