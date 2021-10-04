@@ -21,7 +21,7 @@ typedef struct _worker {
 } worker;
 
 // SETTING PARAMS
-long long const MAX_ROUND = 10;
+long long const MAX_ROUND = 3;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
