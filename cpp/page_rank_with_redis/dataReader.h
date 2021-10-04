@@ -112,6 +112,7 @@ void getAllNodesValue(long long roundId) {
                     double* res = executeGetValsCommand(command, i);
                     auto t_end = std::chrono::high_resolution_clock::now();
                     executedTimeMilisecond = std::chrono::duration<double, std::milli>(t_end - t_start).count();
+                    cout<<"executedTimeMilisecond "<<executedTimeMilisecond<<"\n";
                     bool isDone = true;
                     for (long long k = 0; k < j - next + 1; k++) {
                         if (res[k] < 0) {
