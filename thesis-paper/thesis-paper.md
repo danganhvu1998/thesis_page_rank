@@ -1,7 +1,6 @@
 THESIS - Page Rank on Heterogeneous Clusters
 =====
 
-1. Difficalty when compare as other paper use super computer ...
 # Abstract
 
 + TODO: Add comparation between the application with Spark on Page Rank with the same data set.
