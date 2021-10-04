@@ -106,8 +106,12 @@ void getAllNodesValue(long long roundId) {
                 // SEND TO GET THE DATA
                 char* command = getValsCommand(nodesId, j - next + 1, roundId);
                 long long waitedCount = 0;
+                double executedTimeMilisecond;
                 while (1) {
+                    auto t_start = std::chrono::high_resolution_clock::now();
                     double* res = executeGetValsCommand(command, i);
+                    auto t_end = std::chrono::high_resolution_clock::now();
+                    executedTimeMilisecond = std::chrono::duration<double, std::milli>(t_end - t_start).count();
                     bool isDone = true;
                     for (long long k = 0; k < j - next + 1; k++) {
                         if (res[k] < 0) {
@@ -126,10 +130,12 @@ void getAllNodesValue(long long roundId) {
                         usleep(1000000);
                     }
                 }
-                printf("getNodesValRedis: got %lld / %lld nodes from worker %s\n",
+                printf("getNodesValRedis: got %lld / %lld nodes from worker %s. Last command executed in %llf seconds\n",
                     j - workersList[i].startNode,
                     workersList[i].endNode - workersList[i].startNode,
-                    workersList[i].ip);
+                    workersList[i].ip,
+                    executedTimeMilisecond / 1000
+                );
                 free(command);
                 next = j + 1;
             }
