@@ -58,7 +58,7 @@ long long debugLevel = 100;
 
 // For checking running status
 double readTime, calculateTime, prepareTime, totalRoundTime, roundTime, roundCalTime = -1, roundGetNodeTime = -1, setTime, cacheTime, redisReadTime;
-double redisSetCmdRunningTime, redisGetCmdRunningTime, redisStringToDoubleConvertTime;
+double redisSetCmdRunningTime, redisGetCmdRunningTime = 0, redisStringToDoubleConvertTime;
 
 // 
 long long currentRoundId = 0;
@@ -80,8 +80,9 @@ void __report() {
 
     cout << "\n# SIZE: NODE_COUNT: " << N << "; EDGE_COUNT: " << M << "; ROUND_COUNT: " << MAX_ROUND << "; WORKER_COUNT: " << workersCount << "; WORKER_ID: " << localWorkerId;
     cout << "\n TOTAL TIME: " << totalRoundTime;
-    cout << "\n CALCULATION TIME: " << calculateTime;
-    cout << "\n PREPARE TIME: " << prepareTime;
+    cout << "\n LOAD DATA TO REDIS TIME (local): " << calculateTime;
+    cout << "\n LOAD DATA FROM REDIS TIME (both local and lan): " << prepareTime;
+    cout << "\n GET DATA NETWORK TIME: " << redisGetCmdRunningTime;
 
     cout << "\n\n## REPORT BY RUNNING TIME (MS)";
     cout << "\n\n ### RUNNING TIME BY ROUND:\n";
