@@ -126,6 +126,7 @@ void getAllNodesValue(long long roundId) {
                         usleep(1000000);
                     }
                 }
+                printf("getNodesValRedis: got %lld / %lld nodes from worker %s\n", j, workersList[i].endNode - workersList[i].startNode, workersList[i].ip);
                 free(command);
                 next = j + 1;
             }
