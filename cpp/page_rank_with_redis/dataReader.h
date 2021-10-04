@@ -130,11 +130,11 @@ void getAllNodesValue(long long roundId) {
                         usleep(1000000);
                     }
                 }
-                printf("getNodesValRedis: got %lld / %lld nodes from worker %s. Last command executed in %lf seconds\n",
+                printf("getNodesValRedis: got %lld / %lld nodes from worker %s. Last command executed in %lfms\n",
                     j - workersList[i].startNode,
                     workersList[i].endNode - workersList[i].startNode,
                     workersList[i].ip,
-                    executedTimeMilisecond / 1000
+                    executedTimeMilisecond
                 );
                 free(command);
                 next = j + 1;
