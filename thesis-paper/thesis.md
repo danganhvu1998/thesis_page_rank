@@ -1,7 +1,17 @@
-THESIS - Page Rank on Heterogeneous Clusters
-=====
+- [1. Abstract](#1-abstract)
+- [2. Introduction](#2-introduction)
+- [3. The application](#3-the-application)
+  - [3.1. Overview](#31-overview)
+  - [3.2. Detail in each machine](#32-detail-in-each-machine)
+    - [3.2.1. TODO: expain about data for each node (value + structure)](#321-todo-expain-about-data-for-each-node-value--structure)
+    - [3.2.2. Processor](#322-processor)
+    - [3.2.3. Data Manager](#323-data-manager)
+    - [3.2.4. Local Data](#324-local-data)
+    - [3.2.5. Local Redis](#325-local-redis)
+    - [3.2.6. Initial Load Balancing](#326-initial-load-balancing)
+  - [3.3. Connection detail](#33-connection-detail)
 
-# Abstract
+## 1. Abstract
 
 + TODO: Add comparation between the application with Spark on Page Rank with the same data set.
 
@@ -13,7 +23,7 @@ In this paper, we propose 2 methods to solve these above problems: The first one
 
 [1]: https://www.statista.com/statistics/871513/worldwide-data-created/
 
-# Introduction
+## 2. Introduction
 
 Getting insides from a big graph related data set can be challenging. An typical large graph data set will have 4 following characteristics[2]:
   1. The side of the data set is very big, bigger than the ram capacity of a single machine, make it impractical to process the data using only one machine
@@ -36,9 +46,9 @@ Our contribution can be summarized as follow:
 
 [2]: [From: PGX.D](../paper/PGX.D.pdf)
 
-# The application
+## 3. The application
 
-## Overview
+### 3.1. Overview
 
 
 The application is a distributed in-memory graph processing where a large graph is divided over multiple machine memory in a cluster
@@ -51,17 +61,17 @@ In each round, the task will be again divided into multiple smaller part that ca
 
 In here, we havea cluster of 4 machines to process a graph consis of N nodes. In a round, the first machine will in charge of calculating the result of nodes 1 to A, the second is from A+1 to B, and so on. Note that for each round, the value of A, B, C will be modified for better load balanncing. 
 
-## Detail in each machine
+### 3.2. Detail in each machine
 
 + ![Error](./images/1worker.png)
 
-### TODO: expain about data for each node (value + structure)
+#### 3.2.1. TODO: expain about data for each node (value + structure)
 
-### Processor
+#### 3.2.2. Processor
 
 In charge of calculation the result for each node. Get the data from data data manager. The implementation of processor is quite straigh forward since from its point of view, where is the data and how to get it is not important as the data manager will take care for all of that.
 
-### Data Manager
+#### 3.2.3. Data Manager
 
 As for most of the graph algorithm when running on a cluster, most of the work is communication related insteading processing. So the data manger is the most important part in the application, where all of the data read / write occur.
 
@@ -72,13 +82,15 @@ Data manager has 3 mains task:
 3. Get calculated result of nodes other than from A to B from other machines, and update it to Local Data
 
 
-### Local Data
+#### 3.2.4. Local Data
 
 Simply contain all the values of all the nodes from last round
-### Local Redis
+#### 3.2.5. Local Redis
 
 Local Redis have only one task is to answer request from Data Manager of other machines in the cluster.
 
-### Initial Load Balancing
+#### 3.2.6. Initial Load Balancing
 
 Can be modify depend on the setup and algorithm. Will be more in depth in section ...
+
+### 3.3. Connection detail
