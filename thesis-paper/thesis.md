@@ -36,3 +36,28 @@ Our contribution can be summarized as follow:
 
 [2]: [From: PGX.D](../paper/PGX.D.pdf)
 
+# The application
+
+## Overview
+
+
+The application is a distributed in-memory graph processing where a large graph is divided over multiple machine memory in a cluster
+
+As many different graph processing framework, we also divide the process into multiple rounds. Each round will calculate depend on the result of the last round. The task in each round will be divided again into multiple smaller parts for multiple machines beling to the cluster. In this application we use we use Bulk Synchronous Parallel(BSP), which is each worker will have to wait other worker to finish the same round before continue to the next round. This approach will result in lower error but at the cost of higher running time (compare with Asynchronous Parallel)
+
+In each round, the task will be again divided into multiple smaller part that can run in parallel by multiple machines in the cluster. The following image show a cluster of 4 machines, each will only incharge of processing a portion of the task for a round.
+
++ ![Error](./images/4workers.png)
+
+## 
+[TODO: talk about each connection]
+
+[TODO: Processor]
+
+[TODO: Data reader]
+
+[TODO: Local data]
+
+[TODO: Load Redis]
+
+[TODO: init load balancing]
