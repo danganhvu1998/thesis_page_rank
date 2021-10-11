@@ -49,15 +49,36 @@ In each round, the task will be again divided into multiple smaller part that ca
 
 + ![Error](./images/4workers.png)
 
-## 
-[TODO: talk about each connection]
+In here, we havea cluster of 4 machines to process a graph consis of N nodes. In a round, the first machine will in charge of calculating the result of nodes 1 to A, the second is from A+1 to B, and so on. Note that for each round, the value of A, B, C will be modified for better load balanncing. 
 
-[TODO: Processor]
+## Detail in each machine
 
-[TODO: Data reader]
++ ![Error](./images/1worker.png)
 
-[TODO: Local data]
+### TODO: expain about data for each node (value + structure)
 
-[TODO: Load Redis]
+### Processor
 
-[TODO: init load balancing]
+In charge of calculation the result for each node. Get the data from data data manager. The implementation of processor is quite straigh forward since from its point of view, where is the data and how to get it is not important as the data manager will take care for all of that.
+
+### Data Manager
+
+As for most of the graph algorithm when running on a cluster, most of the work is communication related insteading processing. So the data manger is the most important part in the application, where all of the data read / write occur.
+
+Data manager has 3 mains task:
+
+1. Answer request from processor about the value of nodes. To do this, data manager can always ask Local Data for the value. 
+2. Update calculated result of nodes A to B from processor to both Local Data, and Local Redis
+3. Get calculated result of nodes other than from A to B from other machines, and update it to Local Data
+
+
+### Local Data
+
+Simply contain all the values of all the nodes from last round
+### Local Redis
+
+Local Redis have only one task is to answer request from Data Manager of other machines in the cluster.
+
+### Initial Load Balancing
+
+Can be modify depend on the setup and algorithm. Will be more in depth in section ...
