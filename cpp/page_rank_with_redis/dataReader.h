@@ -127,7 +127,8 @@ void getAllNodesValue(long long roundId) {
                     else {
                         ++waitedCount;
                         if (debugLevel >= 1) {
-                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Cannot find weight of %d nodes . Waited %lld sec\n", workersList[i].ip, roundId, waitedCount);
+                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Cannot find weight of %d nodes . Waited %lld sec\n",
+                            workersList[i].ip, roundId, minusValueCount, waitedCount);
                         }
                         usleep(1000000);
                     }
