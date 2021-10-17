@@ -31,7 +31,7 @@ void calculation(long long round) {
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/graph_1000.data", "r", stdin);
+    freopen("data/soc-LiveJournal1.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     getTask();
