@@ -115,20 +115,19 @@ void getAllNodesValue(long long roundId) {
                     double* res = executeGetValsCommand(command, i);
                     auto t_end = std::chrono::high_resolution_clock::now();
                     executedTimeMilisecond = std::chrono::duration<double, std::milli>(t_end - t_start).count();
-                    bool isDone = true;
+                    int minusValueCount = 0;
                     for (long long k = 0; k < j - next + 1; k++) {
                         if (res[k] < 0) {
-                            isDone = false;
-                            break;
+                            ++minusValueCount;
                         }
                         nodeCachedValue[next + k] = res[k];
                     }
                     free(res);
-                    if (isDone) break;
+                    if (!minusValueCount) break;
                     else {
                         ++waitedCount;
                         if (debugLevel >= 1) {
-                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Waited %lld sec\n", workersList[i].ip, roundId, waitedCount);
+                            printf("getNodesValRedis: Worker %s is not yet finished round %lld. Cannot find weight of %d nodes . Waited %lld sec\n", workersList[i].ip, roundId, waitedCount);
                         }
                         usleep(1000000);
                     }
