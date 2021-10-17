@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <hiredis/hiredis.h>
+#include <omp.h>
 #include "redis.h"
 
 #define II pair<int, int>
@@ -98,7 +99,9 @@ double getNodeVal(long long nodeId, long long roundId) {
 void getAllNodesValue(long long roundId) {
     printf("\n=======================================\n\nSTART GET INDEX CACHED VALUE\n");
     long long nodesId[MAX_SIZE_BULK_GET + 5];
+# pragma omp parallel for default(shared)
     for (int i = 0; i < workersCount; i++) {
+        int threadId = omp_get_thread_num();
         int next = workersList[i].startNode;
         for (int j = workersList[i].startNode; j < workersList[i].endNode; j++) {
             nodesId[j - next] = j;
@@ -130,11 +133,12 @@ void getAllNodesValue(long long roundId) {
                         usleep(1000000);
                     }
                 }
-                printf("getNodesValRedis: got %lld / %lld nodes from worker %s. Last command executed in %lfms\n",
+                printf("getNodesValRedis: got %lld / %lld nodes from worker %s. Last command executed in %lfms by thread %d\n",
                     j - workersList[i].startNode,
                     workersList[i].endNode - workersList[i].startNode,
                     workersList[i].ip,
-                    executedTimeMilisecond
+                    executedTimeMilisecond,
+                    threadId
                 );
                 free(command);
                 next = j + 1;
