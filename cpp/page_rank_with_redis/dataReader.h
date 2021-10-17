@@ -102,6 +102,7 @@ void getAllNodesValue(long long roundId) {
 # pragma omp parallel for default(shared)
     for (int i = 0; i < workersCount; i++) {
         int threadId = omp_get_thread_num();
+        printf("Thread %d will handle getting data from worker %s\n", threadId, workersList[i].ip);
         int next = workersList[i].startNode;
         for (int j = workersList[i].startNode; j < workersList[i].endNode; j++) {
             nodesId[j - next] = j;
@@ -134,7 +135,7 @@ void getAllNodesValue(long long roundId) {
                     }
                 }
                 printf("getNodesValRedis: got %lld / %lld nodes from worker %s. Last command executed in %lfms by thread %d\n",
-                    j - workersList[i].startNode,
+                    j - workersList[i].startNode + 1,
                     workersList[i].endNode - workersList[i].startNode,
                     workersList[i].ip,
                     executedTimeMilisecond,
