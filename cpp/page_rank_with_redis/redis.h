@@ -221,7 +221,7 @@ void distributeTask() {
     freeReplyObject(reply);
     long long startNode = 0, endNode = 0;
     double totalGetTimeByGetNode = 0;
-    if(currentRoundId <=1){
+    if(currentRoundId <=100){
         // First round, every node is equal
         for (int i = 0; i < workersCount; i++) {
             startNode = endNode;

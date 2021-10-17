@@ -98,9 +98,9 @@ double getNodeVal(long long nodeId, long long roundId) {
 
 void getAllNodesValue(long long roundId) {
     printf("\n=======================================\n\nSTART GET INDEX CACHED VALUE\n");
-    long long nodesId[MAX_SIZE_BULK_GET + 5];
 # pragma omp parallel for default(shared)
     for (int i = 0; i < workersCount; i++) {
+        long long nodesId[MAX_SIZE_BULK_GET + 5];
         int threadId = omp_get_thread_num();
         printf("Thread %d will handle getting data from worker %s\n", threadId, workersList[i].ip);
         int next = workersList[i].startNode;
