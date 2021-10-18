@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include <hiredis/hiredis.h>
-#include <omp.h>
+// #include <omp.h>
 #include "redis.h"
 
 #define II pair<int, int>
@@ -101,7 +101,8 @@ void getAllNodesValue(long long roundId) {
 # pragma omp parallel for default(shared)
     for (int i = 0; i < workersCount; i++) {
         long long nodesId[MAX_SIZE_BULK_GET + 5];
-        int threadId = omp_get_thread_num();
+        // int threadId = omp_get_thread_num();
+        int threadId = 0;
         printf("Thread %d will handle getting data from worker %s\n", threadId, workersList[i].ip);
         int next = workersList[i].startNode;
         for (int j = workersList[i].startNode; j < workersList[i].endNode; j++) {
