@@ -1,44 +1,32 @@
-- [1. Abstract](#1-abstract)
-- [2. Introduction](#2-introduction)
-- [3. The Problem](#3-the-problem)
-- [3. The application](#3-the-application)
-  - [3.1. Overview](#31-overview)
-  - [3.2. Detail in each machine](#32-detail-in-each-machine)
-    - [3.2.1. TODO: expain about data for each node (value + structure)](#321-todo-expain-about-data-for-each-node-value--structure)
-    - [3.2.2. Processor](#322-processor)
-    - [3.2.3. Data Manager](#323-data-manager)
-    - [3.2.4. Local Data](#324-local-data)
-    - [3.2.5. Local Redis](#325-local-redis)
-    - [3.2.6. Initial Load Balancing](#326-initial-load-balancing)
-  - [3.3. Connection detail [TODO: too hard to undestand, rewrite in a better way]](#33-connection-detail-todo-too-hard-to-undestand-rewrite-in-a-better-way)
-
 ## 1. Abstract
 
 + TODO: Add comparation between the application with Spark on Page Rank with the same data set.
 
-In recent years, it is not hard to notice that with the development of big data, we have actively accumulated a tremedous amount of data. In 2020, this number is about 64 zettabytes, and 2021 estimate to be 79 zettabytes[1]. As a result, number of data set, the size of the data set, and also the need to extract important insides from the data have been increased significantly. And among these, many are graph related: friends connections, website links, etc. As the size of the data set increased dramatically, it is now almost imporsible for any single machine to handle a big data set with a reasonable amount of times, and most of the time is not even for processing, but to load the data in and out of the ram.
+In recent years, it is not hard to notice that with the development of big data, we have actively accumulated a tremendous amount of data. In 2020, this number is about 64 zettabytes, and 2021 estimate to be 79 zettabytes[1]. As a result, number of data set, the size of the data set, and also the need to extract important insides from the data have been increased significantly. And among these, many are graph related: friends connections, website links, etc. As the size of the data set increased dramatically, it is now almost impossible for any single machine to handle a big data set with a reasonable amount of times, and most of the time is not even for processing, but to load the data in and out of the ram.
 
-A common approach for over size data set is to use multiple machines to form a cluster to work on the same problem and data set. In side the cluster, depend on the compute power of the machine, each will receive a small part of the problems. But this approche have a problem: network overheated. As each machine only contains part of the data set, they have to constantly asking for data from other machines, and thus lead to the problem. Actually, when come to proccsing graph on a cluster of machines, most of the framework spend more time on communicating than on actual computing.
+A common approach for over size data set is to use multiple machines to form a cluster to work on the same problem and data set. In side the cluster, depend on the compute power of the machine, each will receive a small part of the problems. But this approach have a problem: network overheated. As each machine only contains part of the data set, they have to constantly asking for data from other machines, and thus lead to the problem.
 
-So to resolve this problem, in this paper, we propose 2 simple methods aim to reduce the volumn of commnication data between machines, and thus lead to better performance of the application.
+So to resolve this problem, in this paper, we propose 2 simple methods aim to reduce the column of communication data between machines, and thus lead to better performance of the application.
 
 [1]: https://www.statista.com/statistics/871513/worldwide-data-created/
 
 ## 2. Introduction
 
-Recently, as it is become much easier and cheaper to gather a large amount of data with a high precision, the need to extract insight from them also getting bigger. Graph data is also not an exeption. In graph analysis, the data can be present as a graph with nodes present the object, and edges present the connection, or relationship between objects. Some example for this type of data is Facebook Friends where each account is a node, and each of the friend connection is and edge. As Facebook has almost 3 billions active user, with each has in average 340 friends, this data set can has 3 billions nodes with more than 1000 billions edges. By applying various algorithm to the data set, we can extract many valuable insight that is not obvious at first.
+Recently, as it is become much easier and cheaper to gather a large amount of data with a high precision, the need to extract insight from them also getting bigger. Graph data is also not an exception. In graph analysis, the data can be present as a graph with nodes present the object, and edges present the connection, or relationship between objects. Some example for this type of data is Facebook Friends where each account is a node, and each of the friend connection is and edge. As Facebook has almost 3 billions active user, with each has in average 340 friends, this data set can has 3 billions nodes with more than 1000 billions edges. By applying various algorithm to the data set, we can extract many valuable insight that is not obvious at first.
 
-However, applying these algorithms to a big graph data set with high effecency can be challenging. An typical large graph data set will have 4 following characteristics[2]:
-  1. The size of the data set is very big, bigger than the ram capacity of a single machine, make it impractical to process the data using only one machine
-  2. Ram accesses are also very ramdom and umpredictable, make it imposible to know which part of the data set should be loaded in advance. This make pre-loading a segmant of the data set only be impossible.
-  3. The ratio between work load computation and communication is small, leading to most of the time is for communicating between machines in stead of processing the data.
-  4. There is very large degree of inherent parallelism. With the right setup, thousand of independence machines can easily process the same data set without any conflict.
+However, applying these algorithms to a big graph data set with high efficiency can be challenging. A typical large graph data set will have 4 following characteristics[1]:
+  1. The size of the data set is bigger than the ram capacity of a single machine, making it impractical to process the data using only one machine
+  2. Ram accesses are also very random and unpredictable, making it impossible to pre-load the data into ram beforehand.
+  3. The ratio between workload computation and communication is small, leading to most of the time is for communicating between machines instead of processing the data.
+  4. There is a large degree of inherent parallelism. It is possible to set up thousand of independent computers run together on the same data set without conflict. 
 
-It is worth to point out that the second and the third characteristics are very different from classic computing application that normally dominated by commputing and much easier to predict ram access. And this make processsing graph with high effecient in a large scale very difficult. Over the year, multiple frameworks has been created to resolve this problem like GraphX, GraphLab or PGX.D. The idea of all the frameworks are to provide a systematic way to apply various algirithm to a data set, and to increasse the running effecincy by applying various method to reduce communication volumn. Although they have done a greate work, in this paper, we introduce 2 methods to make the communication between machines become even lower. In section 4, we will explain in deep how our system was degined to apply page rank to big data sets, and how do we apply these 2 methods to the system. Next, in section 5, we will evaluate the performance of our system with, and without 2 method, and compare the result with graphX in the same cluster setting.
+It is worth pointing out that the second and the third characteristics are very different from classic computing applications that normally computing dominated and much easier to predict ram access. It is a fact that in most frameworks, the application spends more time communicating than actually doing the computation.
 
-In this paper, our main contribution is:
+And to make the problem worse, balancedly distributing tasks to all computers with very different specs has been proved to be very challenging as sometimes even a smaller computer outperforms the bigger one with a specific algorithm and data set. [2]
 
-  1. A method base on PGX.D's ghost node that can reduce the comminication volumn by merging them in to much bigger requests.  
+In this paper, our main contributions are:
+
+  1. A method base on PGX.D's ghost node that can reduce the communication volume by merging them in to much bigger requests.  
   2. A method for load balancing with minimal communication needed. 
 
 [TODO: Number instead of `SIGNIFICANTLY`]
@@ -47,6 +35,7 @@ In this paper, our main contribution is:
 
 Processing a graph data set on a heterogeneous cluster [TODO: Heterogeneous cluster] will have 2 following problems:
 1. How to limit the communication data between computer
+2. How to distribute task between computer balancely 
 
 
 [2]: [From: PGX.D](../paper/PGX.D.pdf)
