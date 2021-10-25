@@ -14,7 +14,7 @@ using namespace std;
 
 long long const MAX_ROUND = 3;
 double const ACCEPT_ERROR = 0.000001;
-long long const oo = 1000000007, e5 = 100007, e6 = 1000007, e7 = 1000007;
+long long const oo = 1000000007, e5 = 100007, e6 = 1000007, e7 = 10000007;
 long long const MAXIMUM_NODE_SUPPORT = e7; // Accept maximum e6 nodes
 
 vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
@@ -54,7 +54,7 @@ bool isAcceptErrorSastisfied() {
 }
 
 int main() {
-    freopen("./../data/soc-LiveJournal1.out", "r", stdin);
+    freopen("/home/anhvu/gitRepo/thesis_page_rank/cpp/page_rank_with_redis/data/soc-LiveJournal1.out", "r", stdin);
     freopen("result_soc-LiveJournal1.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;

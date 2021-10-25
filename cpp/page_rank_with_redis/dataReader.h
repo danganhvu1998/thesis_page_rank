@@ -3,8 +3,6 @@
 #include <omp.h>
 #include "redis.h"
 
-int bulkSide = 50000;
-
 void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
     char* command = (char*)malloc(2000000 * sizeof(char));
     char* tempVal = (char*)malloc(20);
