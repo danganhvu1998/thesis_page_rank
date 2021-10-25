@@ -67,6 +67,8 @@ There are some important point in our system is that:
 
 #### 4.1.1 Flow
 
++ ![Error](./images/system_design.png)
+
 Flow of a worker that initially assigned nodes from A to B
 1. Step 1: Load graph structure data for the initially assigned node, and also buffer data from Hard Drive.
    1. Assigned Data: From A to B    
