@@ -112,6 +112,7 @@ void getAllNodesValue(long long roundId) {
                 char* command = getValsCommand(nodesId, j - next + 1, roundId);
                 long long waitedCount = 0;
                 double executedTimeMilisecond, executedTimeMilisecond2;
+                debugTime("Command for request has been created.");
                 printf("Send next get request for %s from thread %d\n", workersList[i].ip, threadId);
                 while (1) {
                     auto t_start = std::chrono::high_resolution_clock::now();
