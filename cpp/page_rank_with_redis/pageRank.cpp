@@ -17,13 +17,14 @@ void calculation(long long round) {
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
+        cout<<i<<" -> "<<weight<<endl;
         roundResult.push_back(weight);
     }
     cout << "\nSTART SET VALUE TO REDIS\n";
     double* values = &roundResult[0];
     long long* nodesId = new long long[roundResult.size()];
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) nodesId[i - localWorkerStartNode] = i;
-    setNodesValRedis(nodesId, values, roundResult.size(), round);
+    setNodesValToAllRedis(nodesId, values, roundResult.size(), round);
     free(nodesId);
     cout << "\nDONE SET VALUE TO REDIS\n";
 }
@@ -31,7 +32,7 @@ void calculation(long long round) {
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/soc-LiveJournal1.out", "r", stdin);
+    freopen("data/graph_100.data", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     getTask();
@@ -62,9 +63,6 @@ int main() {
         auto cal_end = std::chrono::high_resolution_clock::now();
         getAllNodesValue(i);
         auto r_end = std::chrono::high_resolution_clock::now();
-        for0(i, 1000) {
-            if(nodeCachedValue[i]<=0) cout<<i<<" ";
-        }
         cout<<endl;
         roundTime = std::chrono::duration<double, std::milli>(r_end - r_start).count();
         roundGetNodeTime = std::chrono::duration<double, std::milli>(r_end - cal_end).count();
