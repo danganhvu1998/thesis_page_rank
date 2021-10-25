@@ -26,7 +26,7 @@ void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCo
 }
 
 void getAllNodesValue(long long roundId) {
-    // TODO: omp
+# pragma omp parallel for default(shared)
     for (int i = 0; i < workersCount; i++) {
         int currWorkerId = getWorkerById(i);
         worker currWorker = workersList[currWorkerId];
@@ -38,6 +38,7 @@ void getAllNodesValue(long long roundId) {
             printf("Start get data pack %dth from %s\n", j, currWorker.ip);
             redisReply* reply = (redisReply*)redisCommand(currWorker.redis, "GET result_of_round_%lld_%d", roundId, j);
             printf("Done get data pack %dth from %s. Start load the data to ram\n", j, currWorker.ip);
+            // TODO: Check if data has not been complated
             valueStr = strtok(reply->str, ";");
             while( valueStr!=NULL ){
                 nodeCachedValue[ currNode ] = atof(valueStr);
