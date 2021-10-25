@@ -17,7 +17,6 @@ void calculation(long long round) {
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
-        cout<<i<<" -> "<<weight<<endl;
         roundResult.push_back(weight);
     }
     cout << "\nSTART SET VALUE TO REDIS\n";
@@ -32,7 +31,7 @@ void calculation(long long round) {
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/graph_100.data", "r", stdin);
+    freopen("data/soc-LiveJournal1.out", "r", stdin);
     // INPUT GRAPH
     cin >> N >> M;
     getTask();
@@ -79,5 +78,5 @@ int main() {
     snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
     freopen(fileName, "w", stdout);
     __report();
-    // for0(i, 1000) cout << nodeCachedValue[i] << ' '; // To make sure the result is correct
+    for0(i, 1000) cout << nodeCachedValue[i] << ' '; // To make sure the result is correct
 }
