@@ -7,4 +7,4 @@ const char* LOCAL_IP_ADDRESS = "192.168.99.203";
 const char* MAIN_WORKER_IP_ADDRESS = "192.168.99.207";
 const int MAX_SIZE_BULK_GET = 100000;
 const float STORAGE_FOR_CACHING_IN_GB = 1.0;
-const bulkSide = 25000;
+const int bulkSide = 25000;
