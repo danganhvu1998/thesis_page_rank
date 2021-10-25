@@ -1,6 +1,6 @@
 ## 1. Abstract
 
-+ TODO: Add comparation between the application with Spark on Page Rank with the same data set.
++ TODO: Add comparison between the application with Spark on Page Rank with the same data set.
 
 In recent years, it is not hard to notice that with the development of big data, we have actively accumulated a tremendous amount of data. In 2020, this number is about 64 zettabytes, and 2021 estimate to be 79 zettabytes[1]. As a result, number of data set, the size of the data set, and also the need to extract important insides from the data have been increased significantly. And among these, many are graph related: friends connections, website links, etc. As the size of the data set increased dramatically, it is now almost impossible for any single machine to handle a big data set with a reasonable amount of times, and most of the time is not even for processing, but to load the data in and out of the ram.
 
@@ -33,16 +33,39 @@ In this paper, our main contributions are:
 
 ## 3. The Problem
 
+As we mentioned above, it is impossible for a machine to handle a big data set alone. But it is doable by using multiple machines to form a cluster, each will only have to calculate the value for a portion of nodes. For a machine, in stead of loading the whole data set, it only needs to load part of the data, enough to finish its own task. In the case of Page Rank, a machine with a nodes list `S` will need to load all the edges have node `s` belong to `S` as the destination. Or [TODO: add pseudo code to explain clearer]
+
+Note that in this way, an edge will be loaded twice by 2 different machines if each of its nodes is not belong to the same machine. Thus, the total loaded data in the cluster always bigger than the size of the data set. 
+
+Another characteristic of graph processing is that: many graph algorithms like Page Rank, we can divide the process into multiple rounds that each depend on the computing result of the last one. To be clear, we use the result of round i-th to calculate the result of round i+1, then using the result of round i+1 to calculate round i+2, and so on. The goal of each round is to calculate a value for all the nodes follow a pre-defined formula. In the case of Page Rank, this value is nodes' weight, and the formula is: [TODO: Add the formula here]
+
+So for a round based algorithm, a machine in the cluster will need to kind of data to finish its task in each round:
+  1. Graph structure that related to its nodes set `S`. The size of this data is very big. [TODO: add estimate compare with the size of data set]. But it will never change though the running process.
+  2. Result of nodes that connected to all nodes `s` belong to `S` from last round. This data has much smaller in side, but constantly changes after each round. So it is necessary for a machine to update this data after finished every round.
+
+A general processing step for a round based algorithm running on clusters will like below:
+
++ ![Error](./images/normal_round_execution.png)
+
+There are 2 point to note about above process:
+  1. Step 2 is optional, it only needed if the system applies dynamic load balancing: update task for all machines after each round aim to get better load balancing. As we mentioned above, graph data is heavy, so transfer graph data between machines in cluster will 
+  2. The last round value of node get updated only when the value is referred to. For example, if the node `n` not in the machine `m`, then `n`'s value only get updated when an node belong to `m` needed its value. This will result in all the machines in cluster send too much small request ask for the value of a single node. Thus, lead to network overload. 
+
+
 Processing a graph data set on a heterogeneous cluster [TODO: Heterogeneous cluster] will have 2 following problems:
 1. How to limit the communication data between computer
-2. How to distribute task between computer balancely 
+2. How to distribute task between computer so that all the machine finish the round at the same time. 
 
 
-[2]: [From: PGX.D](../paper/PGX.D.pdf)
+## 4. Ideas and system design
 
-## 3. The application
+### 4.1 :
 
-### 3.1. Overview
+### 4.1 Dynamic Load Balancing with limited communication
+
+
+
+### 5. System Overview
 
 
 The application is a distributed in-memory graph processing where a large graph is divided over multiple machine memory in a cluster
