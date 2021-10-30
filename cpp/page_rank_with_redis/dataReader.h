@@ -34,7 +34,7 @@ void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCo
 }
 
 void getAllNodesValue(long long roundId) {
-# pragma omp parallel for default(shared)
+// # pragma omp parallel for default(shared)
     for (int i = 0; i < workersCount; i++) {
         int currWorkerId = getWorkerById(i);
         worker currWorker = workersList[currWorkerId];
