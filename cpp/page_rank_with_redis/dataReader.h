@@ -34,8 +34,9 @@ void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCo
 }
 
 void getAllNodesValue(long long roundId) {
-// # pragma omp parallel for default(shared)
+# pragma omp parallel for default(shared)
     for (int i = 0; i < workersCount; i++) {
+        int threadId = omp_get_thread_num();
         int currWorkerId = getWorkerById(i);
         worker currWorker = workersList[currWorkerId];
         int currNode = currWorker.startNode;
@@ -43,7 +44,7 @@ void getAllNodesValue(long long roundId) {
         int commandCnt = (currWorker.endNode - currWorker.startNode) / bulkSide + 1;
 
         for(int j=0; j<commandCnt; j++){
-            printf("Start get data pack %dth from %s\n", j, currWorker.ip);
+            printf("Thread %d: Start get data pack %dth from %s\n", threadId, j, currWorker.ip);
             redisReply* reply = (redisReply*)redisCommand(currWorker.redis, "GET result_of_round_%lld_%d", roundId, j);
             if (reply->str == NULL) {
                 printf("Cannot yet get data pack %dth from %s, Sleep 0.25s\n", j, currWorker.ip);
