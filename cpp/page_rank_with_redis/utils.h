@@ -170,7 +170,7 @@ int getWorkerByIp(char* ipAddress) {
 }
 
 void printWorker(worker w) {
-    printf("\nWORKER %s at ROUND %lld\nSTART - END: %lld - %lld\nLOAD START - END: %lld - %lld\nTIME: cal:%ld - get:%lf\n\n",
+    printf("\nWORKER %s at ROUND %lld\nSTART - END: %lld - %lld\nLOAD START - END: %lld - %lld\nTIME: cal:%lf - get:%lf\n\n",
         w.ip, currentRoundId,
         w.startNode, w.endNode,
         w.loadStartNode, w.loadEndNode,

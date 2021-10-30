@@ -4,21 +4,27 @@
 #include "redis.h"
 
 void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
-    char* command = (char*)malloc(2000000 * sizeof(char));
+    char* command = (char*)malloc(10 * bulkSide * sizeof(char));
     char* tempVal = (char*)malloc(20);
-    int curr=0;
+    int curr=0, currStrPos = 0;
     for(int i=0; i<nodesCount; i++){
         if(i%bulkSide==0){
             if(i>0) {
-                printf("Send command\n");
+                command[currStrPos] = '\0';
+                printf("Send command\n%s\n", command);
                 (redisReply*)redisCommand(local, command);
             }
             printf("Build command %dth | %d / %lld\n", curr, i, nodesCount);
             sprintf(command, "SET result_of_round_%lld_%d ", roundId, curr);
             ++curr;
+            currStrPos = strlen(command);
         }
         sprintf(tempVal, "%lf;", values[i]);
-        strCat(command, tempVal);
+        int srcLen = strlen(tempVal);
+        for (int i = 0; i < srcLen; i++) {
+            command[currStrPos] = tempVal[i];
+            ++currStrPos;
+        }
     }
     (redisReply*)redisCommand(local, command);
     free(command);
@@ -49,6 +55,6 @@ void getAllNodesValue(long long roundId) {
             }
             freeReplyObject(reply);
         }
-        printf("Successfully loaded data from %lld to %lld\n", currWorker.startNode, currNode-1);
+        printf("Successfully loaded data from %lld to %d\n", currWorker.startNode, currNode-1);
     }
 }
