@@ -45,7 +45,15 @@ void getAllNodesValue(long long roundId) {
         for(int j=0; j<commandCnt; j++){
             printf("Start get data pack %dth from %s\n", j, currWorker.ip);
             redisReply* reply = (redisReply*)redisCommand(currWorker.redis, "GET result_of_round_%lld_%d", roundId, j);
-            printf("Done get data pack %dth from %s. Start load the data to ram\n", j, currWorker.ip);
+            if (reply->str == NULL) {
+                printf("Cannot yet get data pack %dth from %s, Sleep 0.25s\n", j, currWorker.ip);
+                freeReplyObject(reply);
+                --j;
+                usleep(250000);
+                continue;
+            } else {
+                printf("Done get data pack %dth from %s. Start load the data to ram\n", j, currWorker.ip);
+            }
             // TODO: Check if data has not been complated
             valueStr = strtok(reply->str, ";");
             while( valueStr!=NULL ){
