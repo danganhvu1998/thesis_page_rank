@@ -232,7 +232,7 @@ void distributeTask() {
                 currentRoundId, startNode,
                 currentRoundId, endNode
             );
-            printf("\nIP %d: %s: %d %d", i, workersList[currWorkerId].ip, startNode, endNode);
+            printf("\nIP %d: %s: %lld %lld", i, workersList[currWorkerId].ip, startNode, endNode);
         }
     } else {
         // Check if all workers have finished last round, or this worker is new
@@ -273,7 +273,7 @@ void distributeTask() {
                 currentRoundId, startNode,
                 currentRoundId, endNode
             );
-            printf("\nID: %d; IP: %s; Task: %d - %d; Last Get Time: %lf", currWorkerId, workersList[currWorkerId].ip, startNode, endNode, workersList[currWorkerId].lastRoundGetDataTime);
+            printf("\nID: %d; IP: %s; Task: %lld - %lld; Last Get Time: %lf", currWorkerId, workersList[currWorkerId].ip, startNode, endNode, workersList[currWorkerId].lastRoundGetDataTime);
         }
     }
     (redisReply*)redisCommand(mainWorkerRedis, "SET DISTRIBUTED_TASK_FOR_ROUND_%lld %lld", currentRoundId, 1);

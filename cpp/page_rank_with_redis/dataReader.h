@@ -11,7 +11,7 @@ void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCo
         if(i%bulkSide==0){
             if(i>0) {
                 command[currStrPos] = '\0';
-                printf("Send command\n%s\n", command);
+                // printf("Send command\n%s\n", command);
                 (redisReply*)redisCommand(local, command);
             }
             printf("Build command %dth | %d / %lld\n", curr, i, nodesCount);
@@ -26,6 +26,8 @@ void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCo
             ++currStrPos;
         }
     }
+    command[currStrPos] = '\0';
+    // printf("Send command\n%s\n", command);
     (redisReply*)redisCommand(local, command);
     free(command);
     free(tempVal);
