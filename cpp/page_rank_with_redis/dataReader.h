@@ -48,7 +48,7 @@ void getAllNodesValue(long long roundId) {
             auto sendStart = std::chrono::high_resolution_clock::now();
             redisReply* reply = (redisReply*)redisCommand(currWorker.redis, "GET result_of_round_%lld_%d", roundId, j);
             auto sendEnd = std::chrono::high_resolution_clock::now();
-            double sendTime = std::chrono::duration<double, std::milli>(sendStart - sendEnd).count();
+            double sendTime = std::chrono::duration<double, std::milli>(sendEnd - sendStart).count();
             if (reply->str == NULL) {
                 printf("Cannot yet get data pack %dth from %s, Sleep 0.25s\n", j, currWorker.ip);
                 freeReplyObject(reply);
