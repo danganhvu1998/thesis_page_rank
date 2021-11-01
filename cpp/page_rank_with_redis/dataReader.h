@@ -45,7 +45,10 @@ void getAllNodesValue(long long roundId) {
 
         for(int j=0; j<commandCnt; j++){
             printf("Thread %d: Start get data pack %dth from %s\n", threadId, j, currWorker.ip);
+            auto sendStart = std::chrono::high_resolution_clock::now();
             redisReply* reply = (redisReply*)redisCommand(currWorker.redis, "GET result_of_round_%lld_%d", roundId, j);
+            auto sendEnd = std::chrono::high_resolution_clock::now();
+            double sendTime = std::chrono::duration<double, std::milli>(sendStart - sendEnd).count();
             if (reply->str == NULL) {
                 printf("Cannot yet get data pack %dth from %s, Sleep 0.25s\n", j, currWorker.ip);
                 freeReplyObject(reply);
@@ -53,7 +56,7 @@ void getAllNodesValue(long long roundId) {
                 usleep(250000);
                 continue;
             } else {
-                printf("Done get data pack %dth from %s. Start load the data to ram\n", j, currWorker.ip);
+                printf("Done get data pack %dth from %s in %lfms. Start load the data to ram\n", j, currWorker.ip,sendTime);
             }
             // TODO: Check if data has not been complated
             valueStr = strtok(reply->str, ";");
