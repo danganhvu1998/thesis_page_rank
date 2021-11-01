@@ -27,7 +27,7 @@ long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
 long long const MAX_WORKERS = 100;
 long long const MAX_THREADS = 15;
-const int bulkSide = 2500000;
+const int bulkSide = 250000;
 
 // Setting workers
 char* ip[MAX_WORKERS];
