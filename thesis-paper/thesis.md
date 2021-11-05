@@ -57,7 +57,13 @@ There are 2 point to note about above process:
 
 ## 4. Ideas and system design
 
-### 4.1 System Overview
+### 4.1 Dynamic Load Balancing with limited communication
+
+### 4.2 Complete Nodes Copy
+
+
+
+### 4.2 System Overview
 
 + ![Error](./images/4workers.png)
 
@@ -65,7 +71,7 @@ There are some important point in our system is that:
 
 1. Instead of randomly distribute nodes to machine as usual [TODO: np hard problem to do better], we assign nodes to a machine by 2 number `A` and `B` means that machine's task is calculate value for all the node from `A` to `B`. The value of `A` and `B` can be updated depend on the running time of last round.
 
-#### 4.1.1 Flow
+#### 4.2.1 Flow
 
 + ![Error](./images/system_design.png)
 
@@ -85,6 +91,3 @@ How to re-distribute task between round, example with a worker that initially as
 2. At the beginning of each round, the worker will receive the task for that round represented by 2 numbers `A’` and `B’`. This means for this round the worker will calculate the weight of nodes from  `A’` to `B’`. It is guaranteed that `A - (B-A)/2` <= `A’` < `B’` <= `B+ (B-A)/2`. 
 3. By this, the worker does not need to read any new data from Hard Drive or have to ask other workers.  => re-distribute tasks is very easy and fast.
 4. But this also means that it cannot go beyond A - (B-A)/2 and B+ (B-A)/2, thus reducing the flexibility of the system.
-### 4.2 Dynamic Load Balancing with limited communication
-
-### 4.3 
