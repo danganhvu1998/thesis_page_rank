@@ -24,11 +24,11 @@ typedef struct _worker {
 long long const MAX_ROUND = 10;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007, e7 = 10000007;;
-long long const MAXIMUM_NODE_SUPPORT = 10 * e6; // Accept maximum 100M nodes
+long long const MAXIMUM_NODE_SUPPORT = 7 * e7; // Accept maximum 100M nodes
 long long const MAX_WORKERS = 100;
 long long const MAX_THREADS = 15;
 const int bulkSide = 2500000;
-long long N = 19500000, M = 300000000;
+long long const N = 19500000, M = 300000000;
 long long seed = 621998;
 
 // Setting workers
@@ -47,7 +47,7 @@ worker workersList[MAX_WORKERS];
 // VARIABLES
 vector<double> runningTimesByRound, calculationTimesByRound, gettingDataTimesByRound;
 vector<long long> edgesTo[e7]; // edgesTo[i] contain list of nodes that can go to i
-long long toNodesCount[MAXIMUM_NODE_SUPPORT];
+long long toNodesCount[N + 10];
 
 // If support openMP
 long long CURRENT_THREAD = 0;
