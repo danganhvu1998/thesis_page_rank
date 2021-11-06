@@ -31,10 +31,11 @@ void calculation(long long round) {
 int main() {
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
-    freopen("data/soc-LiveJournal1.out", "r", stdin);
+    srand(seed);
+    // freopen("data/soc-LiveJournal1.out", "r", stdin);
     // freopen("data/graph_1000.data", "r", stdin);    
     // INPUT GRAPH
-    cin >> N >> M;
+    // cin >> N >> M;
     getTask();
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
     II loadNodeData = getLoadRange(localWorkerStartNode, localWorkerEndNode, 0, N-1);
@@ -44,13 +45,15 @@ int main() {
     for0(i, N+4) toNodesCount[i] = 0;
     for0(i, M) {
         long long a, b;
-        cin >> a >> b; // From a we can go to b
+        // cin >> a >> b; // From a we can go to b
+        a = rand() % N;
+        b = rand() % N;
         ++toNodesCount[a];
         if (b >= localLoadStartNode && b < localWorkerEndNode) {
             // cout << b << " " << a << endl;
             edgesTo[b].push_back(a);
         }
-        // edgesTo[b].push_back(a);
+        if(i%1000000==0) printf("Loaded %lld / %lld - %f%\n", i, M, i*1.0/M*100);
     }
     for0(i, N) nodeCachedValue[i] = 1;
     debugTime("Done READING + INIT");
@@ -79,5 +82,5 @@ int main() {
     snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
     freopen(fileName, "w", stdout);
     __report();
-    for0(i, 1000) cout << nodeCachedValue[i] << ' '; // To make sure the result is correct
+    // for0(i, 1000) cout << nodeCachedValue[i] << ' '; // To make sure the result is correct
 }

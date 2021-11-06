@@ -41,7 +41,10 @@ void getAllNodesValue(long long roundId) {
         worker currWorker = workersList[currWorkerId];
         int currNode = currWorker.startNode;
         char* valueStr;
-        int commandCnt = (currWorker.endNode - currWorker.startNode) / bulkSide + 1;
+        int commandCnt = (currWorker.endNode - currWorker.startNode) / bulkSide;
+        if ((currWorker.endNode - currWorker.startNode)%bulkSide!=0) {
+            commandCnt++;
+        }
 
         for(int j=0; j<commandCnt; j++){
             printf("Thread %d: Start get data pack %dth from %s\n", threadId, j, currWorker.ip);
