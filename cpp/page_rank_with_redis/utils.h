@@ -28,7 +28,7 @@ long long const MAXIMUM_NODE_SUPPORT = 10 * e6; // Accept maximum 100M nodes
 long long const MAX_WORKERS = 100;
 long long const MAX_THREADS = 15;
 const int bulkSide = 2500000;
-long long N = 10000000, M = 300000000;
+long long N = 20000000, M = 300000000;
 long long seed = 621998;
 
 // Setting workers
@@ -46,7 +46,7 @@ worker workersList[MAX_WORKERS];
 
 // VARIABLES
 vector<double> runningTimesByRound, calculationTimesByRound, gettingDataTimesByRound;
-vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
+vector<long long> edgesTo[e7]; // edgesTo[i] contain list of nodes that can go to i
 long long toNodesCount[MAXIMUM_NODE_SUPPORT];
 
 // If support openMP

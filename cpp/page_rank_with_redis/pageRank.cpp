@@ -12,8 +12,8 @@ void calculation(long long round) {
     roundResult.clear();
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) {
         double weight = 0;
-        for0(j, edgesTo[i].size()) {
-            const int fromNode = edgesTo[i][j];
+        for0(j, edgesTo[i-localLoadStartNode].size()) {
+            const int fromNode = edgesTo[i-localLoadStartNode][j];
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
@@ -51,7 +51,7 @@ int main() {
         ++toNodesCount[a];
         if (b >= localLoadStartNode && b < localWorkerEndNode) {
             // cout << b << " " << a << endl;
-            edgesTo[b].push_back(a);
+            edgesTo[b-localLoadStartNode].push_back(a);
         }
         if(i%1000000==0) printf("Loaded %lld / %lld - %f%\n", i, M, i*1.0/M*100);
     }
