@@ -21,13 +21,13 @@ typedef struct _worker {
 } worker;
 
 // SETTING PARAMS
-long long const MAX_ROUND = 3;
+long long const MAX_ROUND = 10;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
 long long const MAXIMUM_NODE_SUPPORT = 5 * e6; // Accept maximum e6 nodes
 long long const MAX_WORKERS = 100;
 long long const MAX_THREADS = 15;
-const int bulkSide = 2500000;
+const int bulkSide = 250;
 
 // Setting workers
 char* ip[MAX_WORKERS];
