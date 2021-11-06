@@ -28,7 +28,7 @@ long long const MAXIMUM_NODE_SUPPORT = 7 * e7; // Accept maximum 100M nodes
 long long const MAX_WORKERS = 100;
 long long const MAX_THREADS = 15;
 const int bulkSide = 2500000;
-long long const N = 19500000, M = 300000000;
+long long const N = 19500000, M = 3000000000;
 long long seed = 621998;
 
 // Setting workers
