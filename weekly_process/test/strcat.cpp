@@ -31,6 +31,14 @@ int main(){
     return 0;
 }
 
+// First 10^5 iterations: < 1s
+// Next 10^5 iterations: > 2s
+// Next 10^5 iterations: > 3s
+// Next 10^5 iterations: > 3s
+// Next 10^5 iterations: > 5s
+// ...
+// Last 10^5 iterations: > 28s
+
 // At Mon Nov  1 10:52:57 2021
 //     DONE NEXT 100000
 
