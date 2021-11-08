@@ -1,71 +1,72 @@
 ## 1. Abstract
 
-+ TODO: Add comparison between the application with Spark on Page Rank with the same data set.
-
-In recent years, it is not hard to notice that with the development of big data, we have actively accumulated a tremendous amount of data. In 2020, this number is about 64 zettabytes, and 2021 estimate to be 79 zettabytes[1]. As a result, number of data set, the size of the data set, and also the need to extract important insides from the data have been increased significantly. And among these, many are graph related: friends connections, website links, etc. As the size of the data set increased dramatically, it is now almost impossible for any single machine to handle a big data set with a reasonable amount of times, and most of the time is not even for processing, but to load the data in and out of the ram.
-
-A common approach for over size data set is to use multiple machines to form a cluster to work on the same problem and data set. In side the cluster, depend on the compute power of the machine, each will receive a small part of the problems. But this approach have a problem: network overheated. As each machine only contains part of the data set, they have to constantly asking for data from other machines, and thus lead to the problem.
-
-So to resolve this problem, in this paper, we propose 2 simple methods aim to reduce the column of communication data between machines, and thus lead to better performance of the application.
-
-[1]: https://www.statista.com/statistics/871513/worldwide-data-created/
+It is an obvious fact that we have actively accumulated a tremendous amount of data. Before 2000, it is unthinkable that we now have the power to access zettabytes of high accuracy data from all the fields from humans, medical, or even tomatoes. As the volume of data increased, so does the need of analyzing the data for insight that can turn back to benefit us. One of these is graph analysis.
+But there is a problem: as the size of the data set gets bigger and bigger, it is now impractical for a regular computer to process a large data set that can be hundreds of times bigger than the ram capacity. A common method for dealing with this problem is to use multiple machines to work together on the same data set. In this approach, each computer will load only a small part of the data set that can fit into its ram capacity, and only execute part of the big process. The final result will be aggregated later. And with the development of multiple cloud computing services like AWS, to cut the cost even further, it is very common that each computer will have different specs, some might even be a virtual one in the cloud.
+However, this approach faces 2 big problems: 
+  1. Network overhead: communication via the network explode while running, thus leading to waste of computing power as the machine has to wait for its needed data
+  2. It is impossible to know in advance how to distribute tasks optimally. In some cases, a computer with less compute power can finish the same task faster than a more powerful one.
+In this paper, we propose 2 methods to reduce network communication that can speed up the process up to 2.5 times when compare with GraphX: 1 for communication when computing, and another is for load balancing. Although we only apply these 2 methods to the Page-rank algorithm, we believe that they can be developed further for other graph-related algorithms as well.
 
 ## 2. Introduction
 
-Recently, as it is become much easier and cheaper to gather a large amount of data with a high precision, the need to extract insight from them also getting bigger. Graph data is also not an exception. In graph analysis, the data can be present as a graph with nodes present the object, and edges present the connection, or relationship between objects. Some example for this type of data is Facebook Friends where each account is a node, and each of the friend connection is and edge. As Facebook has almost 3 billions active user, with each has in average 340 friends, this data set can has 3 billions nodes with more than 1000 billions edges. By applying various algorithm to the data set, we can extract many valuable insight that is not obvious at first.
-
-However, applying these algorithms to a big graph data set with high efficiency can be challenging. A typical large graph data set will have 4 following characteristics[2]:
+Recently, as it is become much easier and cheaper to gather a large amount of data with high precision, the need to extract insight from them also getting bigger. Graph-related data is also not an exception. In graph analysis, the data can be presented as a graph with nodes presenting the object and edges presenting the connection or relationship between objects. An example of this is Facebook friends where each account is a node, and each of the friend connections is an edge. As Facebook has almost 3 billion active users, with each having an average of 340 friends, this data set can have 3 billion nodes with more than 1000 billion edges. By applying various algorithms to the data set, we can extract much valuable insight that is not obvious at first: who is the one with high influences, what is trending now between a certain type of users, etc. 
+However, applying these algorithms to a big graph data set with high efficiency can be challenging. A typical large graph data set will have 4 following characteristics:
   1. The size of the data set is bigger than the ram capacity of a single machine, making it impractical to process the data using only one machine
   2. Ram accesses are also very random and unpredictable, making it impossible to pre-load the data into ram beforehand.
   3. The ratio between workload computation and communication is small, leading to most of the time is for communicating between machines instead of processing the data.
   4. There is a large degree of inherent parallelism. It is possible to set up thousand of independent computers run together on the same data set without conflict. 
 
-It is worth pointing out that the second and the third characteristics are very different from classic computing applications that normally computing dominated and much easier to predict ram access. It is a fact that in most frameworks, the application spends more time communicating than actually doing the computation.
+Another characteristic of graph processing is that: many graph algorithms like Page Rank, we can divide the process into multiple rounds that each depend on the computing result of the last one. To be clear, we use the result of round i-th to calculate the result of round i+1, then using the result of round i+1 to calculate round i+2, and so on. The goal of each round is to calculate a value for all the nodes following a pre-defined formula. In the case of Page Rank, this value is nodes' weight, and the formula is: [TODO: Add the formula here]
 
-And to make the problem worse, balancedly distributing tasks to all computers with very different specs has been proved to be very challenging as sometimes even a smaller computer outperforms the bigger one with a specific algorithm and data set. [3]
+So for a round-based algorithm, a machine in the cluster will need to kind of data to finish its task in each round:
+  1. Graph structure that related to its nodes set `S`. The size of this data is very big. But it will never change through the running process.
+  2. Result of nodes that connected to all nodes `s` belong to `S` from the last round. This data has much smaller in size but constantly changes after each round. So it is necessary for a machine to update this data after finishing every round.
+
+A general processing step for a round-based algorithm running on clusters will like below:
+
++ ![An Image About Execution Step]
+
+There are 2 points to note about the above process:
+  1. Step 2 is optional, it is only needed if the system applies dynamic load balancing: update task for all machines after each round aim to get better load balancing. As we mentioned above, graph data is heavy, so transferring graph data between machines will take a lot of time, depending on the degree of how unbalanced the last round is.
+  2. The last round values of nodes get updated only when the value is referred to. For example, if the node `n` is not in the machine `m`, then `n`'s value only gets updated when a node belonging to `m` needed its value. This will result in all the machines in the cluster sending too many small requests to ask for the value of a single node. This leads to network overload. 
+
+As described above, one of the problems with graph processing is network overheating due to too many small requests. This leads to most of the methods aiming to increase the efficiency of graph processing is about reducing communication between computers, which is very slow due to latency and network capacity. And to do that, one of the easiest and also the most effective is sending/receiving data in bulk. Instead of asking or sending data for 1 node at a time, we can do it for 10000 nodes. 
+
+To make the problem worse, balancedly distributing tasks to all computers with very different specs has been proved to be very challenging as sometimes even a smaller computer outperforms the bigger one with a specific algorithm and data set. To reduce the unbalance between machines in the cluster, we can dynamically re-assign tasks between each round. The idea is simple, slower machines will send their task to faster machines at the end of each round so that they can all finish at the same time next round. It is expected that for the first few rounds, the difference between the slowest machine and the fastest machine is big, but will get smaller and smaller after each round
 
 + ![Error](./images/actual_run_time.png)
-
 [TODO: Add explanation about the image]
+
+Over many years, multiple graph frameworks have been developed like GraphX or PGX.D, but there is still much room for improvement. In this paper, we introduce 2 methods that can even further reduce total network communication: one method aims to reduce network data when processing and another is for dynamic load balancing with under 1Kb data communication needed. 
+
+The structure of the paper is as follow:
+In section 3, we will provide further detail about the facing problem of graph processing. 
+In section 4, we will describe our ideas, and how did we apply them to our system.
+After that, in section 5, we will evaluate the system by comparing it with GraphX, a well-known graph processing framework.
 
 In this paper, our main contributions are:
 
   1. A method base on PGX.D's ghost node that can reduce the communication volume by merging them in to much bigger requests.  
   2. A method for load balancing with minimal communication needed. 
 
-[TODO: Number instead of `SIGNIFICANTLY`]
-
-## 3. The Problem
-
-As we mentioned above, it is impossible for a machine to handle a big data set alone. But it is doable by using multiple machines to form a cluster, each will only have to calculate the value for a portion of nodes. For a machine, in stead of loading the whole data set, it only needs to load part of the data, enough to finish its own task. In the case of Page Rank, a machine with a nodes list `S` will need to load all the edges have node `s` belong to `S` as the destination. Or [TODO: add pseudo code to explain clearer]
-
-Note that in this way, an edge will be loaded twice by 2 different machines if each of its nodes is not belong to the same machine. Thus, the total loaded data in the cluster always bigger than the size of the data set. 
-
-Another characteristic of graph processing is that: many graph algorithms like Page Rank, we can divide the process into multiple rounds that each depend on the computing result of the last one. To be clear, we use the result of round i-th to calculate the result of round i+1, then using the result of round i+1 to calculate round i+2, and so on. The goal of each round is to calculate a value for all the nodes follow a pre-defined formula. In the case of Page Rank, this value is nodes' weight, and the formula is: [TODO: Add the formula here]
-
-So for a round based algorithm, a machine in the cluster will need to kind of data to finish its task in each round:
-  1. Graph structure that related to its nodes set `S`. The size of this data is very big. [TODO: add estimate compare with the size of data set]. But it will never change though the running process.
-  2. Result of nodes that connected to all nodes `s` belong to `S` from last round. This data has much smaller in side, but constantly changes after each round. So it is necessary for a machine to update this data after finished every round.
-
-A general processing step for a round based algorithm running on clusters will like below:
-
-+ ![Error](./images/normal_round_execution.png)
-
-There are 2 point to note about above process:
-  1. Step 2 is optional, it only needed if the system applies dynamic load balancing: update task for all machines after each round aim to get better load balancing. As we mentioned above, graph data is heavy, so transfer graph data between machines will take a lot of time depend on how unbalance the last round is.
-  2. The last round value of node get updated only when the value is referred to. For example, if the node `n` not in the machine `m`, then `n`'s value only get updated when an node belong to `m` needed its value. This will result in all the machines in cluster send too much small request ask for the value of a single node. Thus, lead to network overload. 
 
 ## 4. Ideas and system design
 
++ ![Error](./images/4workers.png)
+
 ### 4.1 Dynamic Load Balancing with limited communication
+
+As we mentioned above, dynamic load balancing can take a long time due to the slower machine have to send a large amount of data about graph structure to the faster machine. To reduce the communication volume, each machine can load extra data from the begining. For example, if a task of a machine is compute the value of nodes belong to array INIT_NODE, it will not only load the edges that contain nodes from INIT_NODE, but also the nodes that belong to array EXTRA_NODE. When that machine have to receive more task from slower machines, it will only accept nodes that come from EXTRA_NODE. By this, no data about the graph structure is needed, only data about extra task. The bigger the size of EXTRA_NODE, the more flexible the system is. For example, if EXTRA node is as big as INIT_NODE, then the faster machine can receive as much as 2 times inital task. Depend on the ram of the machine, and how confident we are about the initial load balancing, we can set up the size of EXTRA_NODE accordingly.
+This method is of course, have some drawbacks. For example, if the initial load balancing is highly unbalanced, then if the fast machine is run 5 time faster than the slower machine, it is impossible to it to get more task than 2 times currently. So this method is only able to modify task distribution to a certain degree.
+
+[TODO: add image to explain the point above]
 
 ### 4.2 Complete Nodes Copy
 
-
+In pagerank, 
 
 ### 4.2 System Overview
 
-+ ![Error](./images/4workers.png)
 
 There are some important point in our system is that:
 
