@@ -9,6 +9,8 @@ In this paper, we propose 2 methods to reduce network communication that can spe
 
 ## 2. Introduction
 
+
+
 Recently, as it is become much easier and cheaper to gather a large amount of data with high precision, the need to extract insight from them also getting bigger. Graph-related data is also not an exception. In graph analysis, the data can be presented as a graph with nodes presenting the object and edges presenting the connection or relationship between objects. An example of this is Facebook friends where each account is a node, and each of the friend connections is an edge. As Facebook has almost 3 billion active users, with each having an average of 340 friends, this data set can have 3 billion nodes with more than 1000 billion edges. By applying various algorithms to the data set, we can extract much valuable insight that is not obvious at first: who is the one with high influences, what is trending now between a certain type of users, etc. 
 However, applying these algorithms to a big graph data set with high efficiency can be challenging. A typical large graph data set will have 4 following characteristics:
   1. The size of the data set is bigger than the ram capacity of a single machine, making it impractical to process the data using only one machine
@@ -63,7 +65,11 @@ This method is of course, have some drawbacks. For example, if the initial load 
 
 ### 4.2 Complete Nodes Copy
 
-In pagerank, 
+In page rank algorithm on a heterogeneous cluster, very often that each machine will have to download 95% of all the nodes from all other machines [TODO: More explanation]. And also, the cost of storing node value is relatively small compared with the graph size. For example, a real-life graph data set with 787.801.471 nodes and 47.614.527.250 is about 11GB, but to be able to store all the values for all the nodes, we just need less than 1GB if using double, or 0.5GB if using float. [https://law.di.unimi.it/datasets.php]
+
+So instead of waiting until a certain node value is needed, each machine will actively download all the node values from other machines. This helps to simplify the program and enables us to send/get in much bigger bulks. 
+
+The idea is that we decided a bulk_size in advance that is the maximum number of nodes that can be sent in one pack. Then for each machine that is in charge of all the nodes from A to B, it will divide all its nodes into (B-A+1) / bulk_size packs, and send them to other machines. 
 
 ### 4.2 System Overview
 
@@ -92,3 +98,5 @@ How to re-distribute task between round, example with a worker that initially as
 2. At the beginning of each round, the worker will receive the task for that round represented by 2 numbers `A’` and `B’`. This means for this round the worker will calculate the weight of nodes from  `A’` to `B’`. It is guaranteed that `A - (B-A)/2` <= `A’` < `B’` <= `B+ (B-A)/2`. 
 3. By this, the worker does not need to read any new data from Hard Drive or have to ask other workers.  => re-distribute tasks is very easy and fast.
 4. But this also means that it cannot go beyond A - (B-A)/2 and B+ (B-A)/2, thus reducing the flexibility of the system.
+
+## Evaluation
