@@ -21,13 +21,13 @@ typedef struct _worker {
 } worker;
 
 // SETTING PARAMS
-long long const MAX_ROUND = 10;
+long long const MAX_ROUND = 3;
 double const ACCEPT_ERROR = 0.0001;
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007, e7 = 10000007;;
-long long const MAXIMUM_NODE_SUPPORT = 7 * e7; // Accept maximum 100M nodes
+long long const MAXIMUM_NODE_SUPPORT = e7; // Accept maximum 10M nodes
 long long const MAX_WORKERS = 100;
 long long const MAX_THREADS = 15;
-const int bulkSide = 2500000;
+const int bulkSide = 300000;
 long long const N = 9500000, M = 300000000;
 long long seed = 621998;
 

@@ -5,11 +5,11 @@
 
 using namespace std;
 
-vector<double> roundResult;
+double roundResult[MAXIMUM_NODE_SUPPORT];
 
 void calculation(long long round) {
     currentRoundId = round;
-    roundResult.clear();
+# pragma omp parallel for default(shared)
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) {
         double weight = 0;
         for0(j, edgesTo[i-localLoadStartNode].size()) {
@@ -17,13 +17,14 @@ void calculation(long long round) {
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
-        roundResult.push_back(weight);
+        roundResult[i-localLoadStartNode] = weight;
     }
     cout << "\nSTART SET VALUE TO REDIS\n";
+    long long nodeCount = localWorkerEndNode - localWorkerStartNode;
     double* values = &roundResult[0];
-    long long* nodesId = new long long[roundResult.size()];
+    long long* nodesId = new long long[nodeCount];
     for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) nodesId[i - localWorkerStartNode] = i;
-    setNodesValToAllRedis(nodesId, values, roundResult.size(), round);
+    setNodesValToAllRedis(nodesId, roundResult, nodeCount, round);
     free(nodesId);
     cout << "\nDONE SET VALUE TO REDIS\n";
 }

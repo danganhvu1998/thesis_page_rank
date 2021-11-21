@@ -8,7 +8,7 @@ void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCo
     if (nodesCount%bulkSide!=0) {
         commandCnt++;
     }
-// # pragma omp parallel for default(shared)
+# pragma omp parallel for default(shared)
     for(int commandPos = 0; commandPos < commandCnt; commandPos++) {
         int threadId = omp_get_thread_num();
         int startNode = commandPos * bulkSide;
@@ -34,7 +34,7 @@ void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCo
         command[currStrPos] = '\0';
         
         (redisReply*)redisCommand(localConnections[threadId], command);
-        printf("\n\n\n%s\n\n\n", command);
+        // printf("\n\n\n%s\n\n\n", command);
         printf("Sent command %dth from nodes %d to %d successfully\n", commandPos, startNode, endNode);
         free(command);
         free(tempVal);
