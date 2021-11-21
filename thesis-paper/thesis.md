@@ -65,7 +65,7 @@ This method is of course, have some drawbacks. For example, if the initial load 
 
 ### 4.2 Complete Nodes Copy
 
-In page rank algorithm on a heterogeneous cluster, very often that each machine will have to download 95% of all the nodes from all other machines [TODO: More explanation]. And also, the cost of storing node value is relatively small compared with the graph size. For example, a real-life graph data set with 787.801.471 nodes and 47.614.527.250 is about 11GB, but to be able to store all the values for all the nodes, we just need less than 1GB if using double, or 0.5GB if using float. [https://law.di.unimi.it/datasets.php]
+In page rank algorithm on a heterogeneous cluster, very often that each machine will have to download 95% of all the nodes from all other machines [TODO: More explanation]. And also, the cost of storing node value is relatively small compared with the graph size. For example, a real-life graph data set with 787.801.471 nodes and 47.614.527.250 is about 11GB, but to be able to store all the values for all the nodes, we just need less than 1GB if using double, or 0.5GB if using float. [https://law.di.unimi.it/webdata/uk-2014/]
 
 So instead of waiting until a certain node value is needed, each machine will actively download all the node values from other machines. This helps to simplify the program and enables us to send/get in much bigger bulks. 
 
@@ -100,3 +100,5 @@ How to re-distribute task between round, example with a worker that initially as
 4. But this also means that it cannot go beyond A - (B-A)/2 and B+ (B-A)/2, thus reducing the flexibility of the system.
 
 ## Evaluation
+
+f

@@ -4,33 +4,38 @@
 #include "redis.h"
 
 void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
-    char* command = (char*)malloc(10 * bulkSide * sizeof(char));
-    char* tempVal = (char*)malloc(20);
-    int curr=0, currStrPos = 0;
-    for(int i=0; i<nodesCount; i++){
-        if(i%bulkSide==0){
-            if(i>0) {
-                command[currStrPos] = '\0';
-                // printf("Send command\n%s\n", command);
-                (redisReply*)redisCommand(local, command);
+    int commandCnt = nodesCount / bulkSide;
+    if (nodesCount%bulkSide!=0) {
+        commandCnt++;
+    }
+    for(int commandPos = 0; commandPos < commandCnt; commandPos++) {
+        int startNode = commandPos * bulkSide;
+        int endNode = min(1LL * (commandPos + 1) * bulkSide , nodesCount) - 1; 
+        int currStrPos = 0;
+        char* command = (char*)malloc(10 * bulkSide * sizeof(char));
+        char* tempVal = (char*)malloc(20);
+        
+        printf("Build command %dth from nodes %d to %d\n", commandPos, startNode, endNode);
+        sprintf(command, "SET result_of_round_%lld_%d ", roundId, commandPos);
+        currStrPos = strlen(command);
+        int srcLen = 0;
+        for(int i = startNode; i <= endNode; i++) {
+            sprintf(tempVal, "%f", values[i]);
+            srcLen = strlen(tempVal);
+            for (int j = 0; j < srcLen; j++) {
+                command[currStrPos] = tempVal[j];
+                ++currStrPos;
             }
-            printf("Build command %dth | %d / %lld\n", curr, i, nodesCount);
-            sprintf(command, "SET result_of_round_%lld_%d ", roundId, curr);
-            ++curr;
-            currStrPos = strlen(command);
-        }
-        sprintf(tempVal, "%lf;", values[i]);
-        int srcLen = strlen(tempVal);
-        for (int i = 0; i < srcLen; i++) {
-            command[currStrPos] = tempVal[i];
+            command[currStrPos] = ' ';
             ++currStrPos;
         }
+        command[currStrPos] = '\0';
+        (redisReply*)redisCommand(local, command);
+        printf("\n\n\n%s\n\n\n", command);
+        printf("Sent command %dth from nodes %d to %d successfully\n", commandPos, startNode, endNode);
+        free(command);
+        free(tempVal);
     }
-    command[currStrPos] = '\0';
-    // printf("Send command\n%s\n", command);
-    (redisReply*)redisCommand(local, command);
-    free(command);
-    free(tempVal);
 }
 
 void getAllNodesValue(long long roundId) {
@@ -53,7 +58,7 @@ void getAllNodesValue(long long roundId) {
             auto sendEnd = std::chrono::high_resolution_clock::now();
             double sendTime = std::chrono::duration<double, std::milli>(sendEnd - sendStart).count();
             if (reply->str == NULL) {
-                printf("Cannot yet get data pack %dth from %s, Sleep 0.25s\n", j, currWorker.ip);
+                printf("Cannot yet get data pack %dth of round %lld from %s, Sleep 0.25s\n", j, roundId,currWorker.ip);
                 freeReplyObject(reply);
                 --j;
                 usleep(250000);
