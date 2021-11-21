@@ -30,6 +30,8 @@ void calculation(long long round) {
 
 int main() {
     debugLevel = 1;
+    // init local connections
+    for(int i=0; i<PHYSICAL_CORES_COUNT; i++) localConnections[i] = redisConnect("127.0.0.1", 6379);
     getRunningEnv(); // Annouce with main worker here
     srand(seed);
     // freopen("data/soc-LiveJournal1.out", "r", stdin);

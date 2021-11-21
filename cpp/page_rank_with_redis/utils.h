@@ -40,6 +40,7 @@ long long maxThreads = 1;
 
 // For redis communication
 redisContext* local = redisConnect("127.0.0.1", 6379);
+redisContext* localConnections[PHYSICAL_CORES_COUNT];
 redisContext* mainWorkerRedis = redisConnect(MAIN_WORKER_IP_ADDRESS, 6379);
 redisContext* workersContext[MAX_WORKERS][MAX_THREADS];
 worker workersList[MAX_WORKERS];
