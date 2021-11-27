@@ -80,6 +80,7 @@ if __name__ == "__main__":
         # ranks = contribs.reduceByKey(add).mapValues(lambda rank: rank * 0.85 + 0.15)
 
     # Collects all URL ranks and dump them to console.
-    ranks.collect()
+    res = ranks.collect()
+    print("\n\n\n\n ---> ALL DONE! <--- \n\n\n\n")
 
     spark.stop()
