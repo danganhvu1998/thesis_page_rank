@@ -77,9 +77,12 @@ if __name__ == "__main__":
             lambda url_urls_rank: computeContribs(url_urls_rank[1][0], url_urls_rank[1][1]))
 
         # Re-calculates URL ranks based on neighbor contributions.
-        # ranks = contribs.reduceByKey(add).mapValues(lambda rank: rank * 0.85 + 0.15)
+        ranks = contribs.reduceByKey(add).mapValues(lambda rank: rank * 0.85 + 0.15)
 
     # Collects all URL ranks and dump them to console.
-    ranks.collect()
+    res = ranks.collect()
+    for i in range(1000):
+        print(f"{i}: {res[i]}")
+    print("\n\n\n\n ---> ALL DONE! <--- \n\n\n\n")
 
     spark.stop()
