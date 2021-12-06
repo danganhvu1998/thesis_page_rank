@@ -12,9 +12,9 @@ using namespace std;
 #define for0(i, n) for (long long i = 0; i < n; i++)
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
-long long const MAX_ROUND = 3;
+long long const MAX_ROUND = 10;
 double const ACCEPT_ERROR = 0.000001;
-long long const oo = 1000000007, e5 = 100007, e6 = 1000007, e7 = 1000007;
+long long const oo = 1000000007, e5 = 100007, e6 = 1000007, e7 = 10000007;
 long long const MAXIMUM_NODE_SUPPORT = e7; // Accept maximum e6 nodes
 
 vector<long long> edgesTo[MAXIMUM_NODE_SUPPORT]; // edgesTo[i] contain list of nodes that can go to i
@@ -55,7 +55,7 @@ bool isAcceptErrorSastisfied() {
 
 int main() {
     freopen("./../data/soc-LiveJournal1.out", "r", stdin);
-    freopen("result_soc-LiveJournal1.out", "w", stdout);
+    //freopen("result_soc-LiveJournal1.out", "w", stdout);
     // INPUT GRAPH
     cin >> N >> M;
     cout<<N<<" "<<M<<endl;    
@@ -74,7 +74,7 @@ int main() {
         calculation(i);
         debugTime("Done round " + to_string(i));
         lastRound = i;
-        if (isAcceptErrorSastisfied()) break;
+        // if (isAcceptErrorSastisfied()) break;
     }
     const int lastRoundWeightIndex = lastRound % 2 ? 1 : 0;
     for0(i, 1000) cout << nodeWeight[lastRoundWeightIndex][i] << ' ';
