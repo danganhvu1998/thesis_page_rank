@@ -24,6 +24,7 @@ bin/spark-submit examples/src/main/python/pagerank.py data/mllib/pagerank_data.t
 import re
 import sys
 from operator import add
+import datetime
 
 from pyspark.sql import SparkSession
 
@@ -46,10 +47,6 @@ if __name__ == "__main__":
         print("Usage: pagerank <file> <iterations>", file=sys.stderr)
         sys.exit(-1)
 
-    print("WARN: This is a naive implementation of PageRank and is given as an example!\n" +
-          "Please refer to PageRank implementation provided by graphx",
-          file=sys.stderr)
-
     # Initialize the spark context.
     spark = SparkSession\
         .builder\
@@ -61,6 +58,7 @@ if __name__ == "__main__":
     #     URL         neighbor URL
     #     URL         neighbor URL
     #     ...
+    start_time = datetime.datetime.now()
     lines = spark.read.text(sys.argv[1]).rdd.map(lambda r: r[0])
 
     # Loads all URLs from input file and initialize their neighbors.
@@ -81,8 +79,11 @@ if __name__ == "__main__":
 
     # Collects all URL ranks and dump them to console.
     res = ranks.collect()
-    for i in range(1000):
+    end_time = datetime.datetime.now()
+    for i in range(10):
         print(f"{i}: {res[i]}")
-    print("\n\n\n\n ---> ALL DONE! <--- \n\n\n\n")
+    print("Start time:", start_time)
+    print("End time:", end_time)
+    print("Run time (secs):", end_time-start_time)
 
     spark.stop()
