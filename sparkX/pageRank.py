@@ -15,12 +15,6 @@
 # limitations under the License.
 #
 
-"""
-This is an example implementation of PageRank. For more conventional use,
-Please refer to PageRank implementation provided by graphx
-Example Usage:
-bin/spark-submit examples/src/main/python/pagerank.py data/mllib/pagerank_data.txt 10
-"""
 import re
 import sys
 from operator import add
@@ -84,6 +78,7 @@ if __name__ == "__main__":
         print(f"{i}: {res[i]}")
     print("Start time:", start_time)
     print("End time:", end_time)
-    print("Run time (secs):", end_time-start_time)
+    print("Rounds:", int(sys.argv[2])
+    print("Run time (secs):", (end_time-start_time).total_seconds())
 
     spark.stop()
