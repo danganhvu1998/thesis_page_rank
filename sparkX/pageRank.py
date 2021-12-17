@@ -41,6 +41,10 @@ if __name__ == "__main__":
         print("Usage: pagerank <file> <iterations>", file=sys.stderr)
         sys.exit(-1)
 
+    print("\n\n======================================\n\n")
+    print("File:", sys.argv[1])
+    print("Rounds:", int(sys.argv[2]))
+
     # Initialize the spark context.
     spark = SparkSession\
         .builder\
@@ -63,7 +67,6 @@ if __name__ == "__main__":
 
     # Calculates and updates URL ranks continuously using PageRank algorithm.
     for iteration in range(int(sys.argv[2])):
-        print("Running ", iteration)
         # Calculates URL contributions to the rank of other URLs.
         contribs = links.join(ranks).flatMap(
             lambda url_urls_rank: computeContribs(url_urls_rank[1][0], url_urls_rank[1][1]))
@@ -78,6 +81,7 @@ if __name__ == "__main__":
         print(f"{i}: {res[i]}")
     print("Start time:", start_time)
     print("End time:", end_time)
+    print("File:", sys.argv[1])
     print("Rounds:", int(sys.argv[2]))
     print("Run time (secs):", (end_time-start_time).total_seconds())
 
