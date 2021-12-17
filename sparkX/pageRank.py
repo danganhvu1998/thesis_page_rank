@@ -78,7 +78,7 @@ if __name__ == "__main__":
         print(f"{i}: {res[i]}")
     print("Start time:", start_time)
     print("End time:", end_time)
-    print("Rounds:", int(sys.argv[2])
+    print("Rounds:", int(sys.argv[2]))
     print("Run time (secs):", (end_time-start_time).total_seconds())
 
     spark.stop()
