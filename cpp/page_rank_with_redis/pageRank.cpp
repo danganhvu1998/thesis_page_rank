@@ -31,14 +31,15 @@ void calculation(long long round) {
 
 int main() {
     debugLevel = 1;
+    getRunningEnv(); // Annouce with main worker here
     // init local connections
     for(int i=0; i<PHYSICAL_CORES_COUNT; i++) localConnections[i] = redisConnect("127.0.0.1", 6379);
-    getRunningEnv(); // Annouce with main worker here
-    srand(seed);
-    // freopen("data/soc-LiveJournal1.out", "r", stdin);
+    freopen("data/graph_500000_10.out", "r", stdin);
     // freopen("data/graph_1000.data", "r", stdin);    
     // INPUT GRAPH
     // cin >> N >> M;
+    N = 500000;
+    M = N * 10;
     getTask();
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
     II loadNodeData = getLoadRange(localWorkerStartNode, localWorkerEndNode, 0, N-1);
@@ -48,16 +49,15 @@ int main() {
     for0(i, N+4) toNodesCount[i] = 0;
     for0(i, M) {
         long long a, b;
-        // cin >> a >> b; // From a we can go to b
-        a = rand() % N;
-        b = rand() % N;
+        cin >> a >> b; // From a we can go to b
         ++toNodesCount[a];
         if (b >= localLoadStartNode && b < localWorkerEndNode) {
             // cout << b << " " << a << endl;
-            edgesTo[b-localLoadStartNode].push_back(a);
+            edgesTo[b].push_back(a);
         }
-        if(i%1000000==0) printf("Loaded %lld / %lld - %f%\n", i, M, i*1.0/M*100);
+        // edgesTo[b].push_back(a);
     }
+    debugLevel = 1;
     for0(i, N) nodeCachedValue[i] = 1;
     debugTime("Done READING + INIT");
     for1(i, MAX_ROUND) {
