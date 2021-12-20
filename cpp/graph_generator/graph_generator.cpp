@@ -12,8 +12,8 @@ using namespace std;
 #define for1(i, n) for (long long i = 1; i <= n; i++)
 
 long long const oo = 1000000007, e5 = 100007, e6 = 1000007;
-long long const NODE_COUNT = 50000;
-long long const EDGE_PER_NODE = 1000;
+long long const NODE_COUNT = 5000000;
+long long const EDGE_PER_NODE = 10;
 long long const EDGE_COUNT = NODE_COUNT * EDGE_PER_NODE;
 
 void printEdge(long long from, long long to) {
@@ -28,8 +28,8 @@ long long randNode(long long fromNode = -1) {
 }
 
 int main() {
-    freopen("graph_10000.out", "w", stdout);
-    cout << NODE_COUNT << ' ' << EDGE_COUNT << '\n';
+    freopen("graph_5000000_10.out", "w", stdout);
+    // cout << NODE_COUNT << ' ' << EDGE_COUNT << '\n';
     for0(i, NODE_COUNT) {
         for0(j, EDGE_PER_NODE) {
             long long fromNode = i;
