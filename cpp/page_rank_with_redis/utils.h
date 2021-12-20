@@ -48,7 +48,7 @@ worker workersList[MAX_WORKERS];
 // VARIABLES
 vector<double> runningTimesByRound, calculationTimesByRound, gettingDataTimesByRound;
 vector<long long> edgesTo[e7]; // edgesTo[i] contain list of nodes that can go to i
-long long toNodesCount[N + 10];
+long long toNodesCount[9500010];
 
 // If support openMP
 long long CURRENT_THREAD = 0;
