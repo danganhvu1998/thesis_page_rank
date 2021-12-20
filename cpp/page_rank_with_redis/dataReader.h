@@ -3,7 +3,7 @@
 #include <omp.h>
 #include "redis.h"
 
-void setNodesValToAllRedis(long long* nodesId, double* values, long long nodesCount, long long roundId) {
+void setNodesValToAllRedis(double* values, long long nodesCount, long long roundId) {
     int commandCnt = nodesCount / bulkSide;
     if (nodesCount%bulkSide!=0) {
         commandCnt++;

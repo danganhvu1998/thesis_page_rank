@@ -21,11 +21,7 @@ void calculation(long long round) {
     }
     cout << "\nSTART SET VALUE TO REDIS\n";
     long long nodeCount = localWorkerEndNode - localWorkerStartNode;
-    double* values = &roundResult[0];
-    long long* nodesId = new long long[nodeCount];
-    for (long long i = localWorkerStartNode; i < localWorkerEndNode; i++) nodesId[i - localWorkerStartNode] = i;
-    setNodesValToAllRedis(nodesId, roundResult, nodeCount, round);
-    free(nodesId);
+    setNodesValToAllRedis(roundResult, nodeCount, round);
     cout << "\nDONE SET VALUE TO REDIS\n";
 }
 
