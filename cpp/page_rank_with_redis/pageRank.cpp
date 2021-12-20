@@ -34,12 +34,12 @@ int main() {
     getRunningEnv(); // Annouce with main worker here
     // init local connections
     for(int i=0; i<PHYSICAL_CORES_COUNT; i++) localConnections[i] = redisConnect("127.0.0.1", 6379);
-    freopen("data/graph_500000_10.out", "r", stdin);
+    freopen("data/graph_500000_100.out", "r", stdin);
     // freopen("data/graph_1000.data", "r", stdin);    
     // INPUT GRAPH
     // cin >> N >> M;
     N = 500000;
-    M = N * 10;
+    M = N * 100;
     getTask();
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
     II loadNodeData = getLoadRange(localWorkerStartNode, localWorkerEndNode, 0, N-1);
