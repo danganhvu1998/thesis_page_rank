@@ -25,17 +25,15 @@ void calculation(long long round) {
     cout << "\nDONE SET VALUE TO REDIS\n";
 }
 
-int main() {
+int main(int argc, char **argv) {
+    char* dataDir = argv[1];
+    N = stoi(argv[2]);
+    M = stoi(argv[3]);
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
     // init local connections
     for(int i=0; i<PHYSICAL_CORES_COUNT; i++) localConnections[i] = redisConnect("127.0.0.1", 6379);
-    freopen("data/soc-LiveJournal1.out", "r", stdin);
-    // freopen("data/graph_1000.data", "r", stdin);    
-    // INPUT GRAPH
-    cin >> N >> M;
-    // N = 5000000;
-    // M = N * 10;
+    freopen(dataDir, "r", stdin);
     getTask();
     localWorkerEndNode = min(localWorkerEndNode, N + 1);
     II loadNodeData = getLoadRange(localWorkerStartNode, localWorkerEndNode, 0, N-1);
