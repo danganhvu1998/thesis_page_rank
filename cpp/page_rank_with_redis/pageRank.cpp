@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     // char* dataDir = argv[1];
     // N = stoi(argv[2]);
     // M = stoi(argv[3]);
-    char* dataDir = "./data/graph_100000_320.out";
+    char* dataDir = "./data/graph_100000_640.out";
     N = 100000;
-    M = N * 320;
+    M = N * 640;
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
     // init local connections
