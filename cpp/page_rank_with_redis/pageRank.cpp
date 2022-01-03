@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     // char* dataDir = argv[1];
     // N = stoi(argv[2]);
     // M = stoi(argv[3]);
-    char* dataDir = "./data/graph_100000_2560.out";
+    char* dataDir = "./data/graph_100000_10.out";
     N = 100000;
-    M = N * 2560;
+    M = N * 10;
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
     // init local connections
@@ -77,9 +77,12 @@ int main(int argc, char **argv) {
         calculateTime += roundCalTime;
         prepareTime += roundGetNodeTime;
     }
-    __report();
-    char* fileName = (char*)malloc(100);
-    snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
-    freopen(fileName, "w", stdout);
-    __report();
+    // __report();
+    // char* fileName = (char*)malloc(100);
+    // snprintf(fileName, 100, "./result/run_time_result_%lld_%lld_%ld_%lld_%lld.md", N, M, time(0), workersCount, localWorkerId);
+    // freopen(fileName, "w", stdout);
+    // __report();
+    for(int i=0; i<100; i++) {
+        printf("%lf ", nodeCachedValue[i]);
+    }
 }
