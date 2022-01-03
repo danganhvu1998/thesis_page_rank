@@ -14,10 +14,11 @@ void calculation(long long round) {
         double weight = 0;
         for0(j, edgesTo[i-localLoadStartNode].size()) {
             const int fromNode = edgesTo[i-localLoadStartNode][j];
-            // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
+            cout << "         ->"<<fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
         roundResult[i-localWorkerStartNode] = weight;
+        printf("At %d, value %f\n", i - localWorkerStartNode, weight);
     }
     cout << "\nSTART SET VALUE TO REDIS\n";
     long long nodeCount = localWorkerEndNode - localWorkerStartNode;
@@ -50,7 +51,7 @@ int main(int argc, char **argv) {
         ++toNodesCount[a];
         if (b >= localLoadStartNode && b < localWorkerEndNode) {
             // cout << b << " " << a << endl;
-            edgesTo[b].push_back(a);
+            edgesTo[b-localLoadStartNode].push_back(a);
         }
         // edgesTo[b].push_back(a);
     }

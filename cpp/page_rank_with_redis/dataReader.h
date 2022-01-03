@@ -8,6 +8,11 @@ void setNodesValToAllRedis(double* values, long long nodesCount, long long round
     if (nodesCount%bulkSide!=0) {
         commandCnt++;
     }
+    printf("VALUES: ");
+    for(int i=0; i<10; i++) {
+        printf("%lf ", values[i]);
+    }
+    printf("\n");
 # pragma omp parallel for default(shared)
     for(int commandPos = 0; commandPos < commandCnt; commandPos++) {
         int threadId = omp_get_thread_num();
