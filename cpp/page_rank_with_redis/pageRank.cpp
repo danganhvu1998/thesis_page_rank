@@ -14,11 +14,11 @@ void calculation(long long round) {
         double weight = 0;
         for0(j, edgesTo[i-localLoadStartNode].size()) {
             const int fromNode = edgesTo[i-localLoadStartNode][j];
-            cout << "         ->"<<fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
+            // cout << "         ->"<<fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
         roundResult[i-localWorkerStartNode] = weight;
-        printf("At %d, value %f\n", i - localWorkerStartNode, weight);
+        // printf("At %d, value %f\n", i - localWorkerStartNode, weight);
     }
     cout << "\nSTART SET VALUE TO REDIS\n";
     long long nodeCount = localWorkerEndNode - localWorkerStartNode;
@@ -30,9 +30,9 @@ int main(int argc, char **argv) {
     // char* dataDir = argv[1];
     // N = stoi(argv[2]);
     // M = stoi(argv[3]);
-    char* dataDir = "./data/graph_100.data";
-    N = 100;
-    M = N * 20;
+    char* dataDir = "./data/graph_100000_10.out";
+    N = 100000;
+    M = N * 10;
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
     // init local connections
