@@ -17,7 +17,7 @@ void calculation(long long round) {
             // cout << fromNode << " " << toNodesCount[fromNode] << " " << nodeCachedValue[fromNode] << endl;
             weight += nodeCachedValue[fromNode] / toNodesCount[fromNode];
         }
-        roundResult[i-localLoadStartNode] = weight;
+        roundResult[i-localWorkerStartNode] = weight;
     }
     cout << "\nSTART SET VALUE TO REDIS\n";
     long long nodeCount = localWorkerEndNode - localWorkerStartNode;
@@ -76,10 +76,10 @@ int main(int argc, char **argv) {
         totalRoundTime += roundTime;
         calculateTime += roundCalTime;
         prepareTime += roundGetNodeTime;
-        for(int k =0; k<100; k++){
-                printf("%lf ", nodeCachedValue[k]);
-            }
-        printf("\n");
+        // for(int k =0; k<100; k++){
+        //         printf("%lf ", nodeCachedValue[k]);
+        //     }
+        // printf("\n");
     }
     // __report();
     // char* fileName = (char*)malloc(100);
