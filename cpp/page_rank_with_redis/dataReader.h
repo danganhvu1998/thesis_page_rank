@@ -47,12 +47,14 @@ void getAllNodesValue(long long roundId) {
         int threadId = omp_get_thread_num();
         int currWorkerId = getWorkerById(i);
         worker currWorker = workersList[currWorkerId];
+        printWorker(currWorker);
         int currNode = currWorker.startNode;
         char* valueStr;
         int commandCnt = (currWorker.endNode - currWorker.startNode) / bulkSide;
         if ((currWorker.endNode - currWorker.startNode)%bulkSide!=0) {
             commandCnt++;
         }
+        printf("===> currNode: %d; commandCnt: %d\n", currNode, commandCnt);
 
         for(int j=0; j<commandCnt; j++){
             printf("Thread %d: Start get data pack %dth from %s\n", threadId, j, currWorker.ip);
@@ -69,10 +71,16 @@ void getAllNodesValue(long long roundId) {
             } else {
                 printf("Done get data pack %dth from %s in %lfms. Start load the data to ram\n", j, currWorker.ip,sendTime);
             }
+            if(currNode >= 60){
+                printf("\n\n%s\n\n", reply->str);
+            }
             // TODO: Check if data has not been complated
             valueStr = strtok(reply->str, ";");
             while( valueStr!=NULL ){
                 nodeCachedValue[ currNode ] = atof(valueStr);
+                // if(currNode>=60){
+                //     printf("======> %d: %f\n", currNode, nodeCachedValue[ currNode ]);
+                // }
                 if(currNode%100000==0){
                     printf("Loading data from %lld to %lld, finished to %d\n", currWorker.startNode, currWorker.endNode, currNode);
                 }

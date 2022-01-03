@@ -89,4 +89,5 @@ int main(int argc, char **argv) {
     for(int i=0; i<100; i++) {
         printf("%lf ", nodeCachedValue[i]);
     }
+    printf("\n%d %d\n", localWorkerStartNode, localWorkerEndNode);
 }
