@@ -34,7 +34,7 @@ void setNodesValToAllRedis(double* values, long long nodesCount, long long round
         command[currStrPos] = '\0';
         
         (redisReply*)redisCommand(localConnections[threadId], command);
-        // printf("\n\n\n%s\n\n\n", command);
+        printf("\n\n\n%s\n\n\n", command);
         printf("Sent command %dth from nodes %d to %d successfully\n", commandPos, startNode, endNode);
         free(command);
         free(tempVal);
@@ -71,9 +71,9 @@ void getAllNodesValue(long long roundId) {
             } else {
                 printf("Done get data pack %dth from %s in %lfms. Start load the data to ram\n", j, currWorker.ip,sendTime);
             }
-            if(currNode >= 60){
-                printf("\n\n%s\n\n", reply->str);
-            }
+            // if(currNode >= 60){
+            //     printf("\n\n%s\n\n", reply->str);
+            // }
             // TODO: Check if data has not been complated
             valueStr = strtok(reply->str, ";");
             while( valueStr!=NULL ){
