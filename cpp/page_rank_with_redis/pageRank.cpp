@@ -29,9 +29,9 @@ int main(int argc, char **argv) {
     // char* dataDir = argv[1];
     // N = stoi(argv[2]);
     // M = stoi(argv[3]);
-    char* dataDir = "./data/graph_100000_10.out";
-    N = 100000;
-    M = N * 10;
+    char* dataDir = "./data/graph_100.data";
+    N = 100;
+    M = N * 20;
     debugLevel = 1;
     getRunningEnv(); // Annouce with main worker here
     // init local connections
@@ -76,6 +76,10 @@ int main(int argc, char **argv) {
         totalRoundTime += roundTime;
         calculateTime += roundCalTime;
         prepareTime += roundGetNodeTime;
+        for(int k =0; k<100; k++){
+                printf("%lf ", nodeCachedValue[k]);
+            }
+        printf("\n");
     }
     // __report();
     // char* fileName = (char*)malloc(100);
